@@ -1,0 +1,150 @@
+---
+title: "Ghod Sub-basin CFRA Forest Selection"
+author: "Elisa Stefaniak"
+date: "2025-02-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file(),
+                     knitr.digits.signif = TRUE)
+
+options(stringsAsFactors = FALSE)
+library(raster)
+library(tidyverse)
+library(inborutils)
+library(sf)
+library(terra)
+library(gtools)
+```
+
+## The Problem
+
+In this document I describe the process of generating aforestation maps for the Bhima Upper Basin Ghod Sub-basin. 
+First we examine the Ghod Sub-basin and it's current aforestation. 
+
+Load Ghod Sub-basin region
+
+```{r ghod_subbasin_mask}
+data_gpkg_region <- sf::read_sf("data/maps/region.gpkg")
+data_gpkg_region_2d <- st_zm(data_gpkg_region$geom)
+
+ggplot() + 
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") + 
+  # geom_sf(data = data_gpkg_2d, fill = "grey") +
+  # geom_sf(data = data_gpkg_intersected_2d, fill = "forestgreen") + 
+  # geom_sf(data = data_gpkg_intersected_out_2d, fill = "lightgreen") + 
+  scale_x_continuous(limits = c(73.5, 74.05)) + 
+  scale_y_continuous(limits = c(18.95, 19.25))
+```
+
+Total size of the Ghod Sub-basin region is `r sum(st_area(data_gpkg_region_2d))` m2.
+
+Get current aforestation (raster), subset to just forests and convert to shapes. This is done in a separate code file (`code/create_current_forest_polygons.R`) as the process is computing-intensive. 
+
+
+```{r print_land_use}
+useclass_gpkg <- rast("data/maps/land_use_classes.tif")
+
+## Forest area is under 0 so we make everything else NA
+current_forest2 <- sf::read_sf("out/current_forest.shp")
+
+ggplot() +
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") + 
+  geom_sf(data = current_forest2, fill = "forestgreen", lwd = 0) + 
+  # geom_tile(data = clipped_raster_df, aes(x = x, y = y, fill = "landsurface/land_use_classes")) +
+  scale_x_continuous(limits = c(73.5, 74.05)) + 
+  scale_y_continuous(limits = c(18.95, 19.25)) +
+  guides(fill="none")
+```
+
+Current afforestation is `r sum(st_area(current_forest2))` m2 which is: `r 100 * sum(st_area(current_forest2)) / st_area(data_gpkg_region_2d)`% of the total area of the subbasin.
+
+Now, I examine the aforestation from the CFRA regions (dark grey) and subset to only the Ghod Subbasin (light grey). 
+
+```{r}
+data_gpkg <- sf::read_sf("data/maps/junnar_potential_CFR.gpkg")
+data_gpkg_2d <- st_zm(data_gpkg$geom)
+
+# Extract forests only in modelled area
+
+intersected_CFRS <- st_intersects(data_gpkg_region_2d, data_gpkg_2d)
+
+data_gpkg_intersected_2d <- data_gpkg_2d[intersected_CFRS[[1]]]
+data_gpkg_intersected_out_2d <- st_intersection(data_gpkg_region_2d, data_gpkg_2d)
+
+ggplot() +
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") +
+  geom_sf(data = data_gpkg_2d, fill = "grey") +
+  # geom_sf(data = data_gpkg_intersected_2d, fill = "forestgreen") +
+  geom_sf(data = data_gpkg_intersected_out_2d, fill = "lightgreen") +
+  scale_x_continuous(limits = c(73.5, 74.05)) +
+  scale_y_continuous(limits = c(18.95, 19.25))
+```
+
+The total potential new aforested area is `r sum(st_area(data_gpkg_intersected_out_2d))` m2 which is: `r 100 * (sum(st_area(data_gpkg_intersected_out_2d))) / st_area(data_gpkg_region_2d)`% of the total area of the subbasin. The maximum aforestation we would get in the basin is therefore: `r 100 * (sum(st_area(data_gpkg_intersected_out_2d)) + sum(st_area(current_forest2))) / st_area(data_gpkg_region_2d)`%.
+
+If we include now also the original forests we get:
+
+```{r}
+ggplot() +
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") +
+  geom_sf(data = data_gpkg_2d, fill = "grey") +
+  geom_sf(data = current_forest2, fill = "forestgreen", lwd = 0) + 
+  # geom_sf(data = data_gpkg_intersected_2d, fill = "forestgreen") +
+  geom_sf(data = data_gpkg_intersected_out_2d, fill = "lightgreen") +
+  scale_x_continuous(limits = c(73.5, 74.05)) +
+  scale_y_continuous(limits = c(18.95, 19.25))
+```
+
+## Are there intersections in the current and potential new forest areas?
+
+## What are the CFRA forests currently?
+
+## Random subsetting of CFRA forests
+
+We want to look at 0-100%. Below I create a code to get 50% of the plots. 
+
+```{r}
+forest_areas <- st_area(data_gpkg_intersected_out_2d)
+total_area = sum(forest_areas)
+
+area_percentage = 0.5
+total_area_aim = total_area * area_percentage
+
+forest_areas_perm_ind <- permute(1:length(forest_areas))
+forest_areas_perm <- forest_areas[forest_areas_perm_ind]
+forest_areas_perm_cumsum <- cumsum(forest_areas_perm)
+ind_out <- forest_areas_perm_ind[forest_areas_perm_cumsum <= total_area_aim]
+
+data_gpkg_intersected_out_2d_subset <- data_gpkg_intersected_out_2d[ind_out]
+
+sum(st_area(data_gpkg_intersected_out_2d_subset)) / 10000
+
+ggplot() + 
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") + 
+  geom_sf(data = data_gpkg_2d, fill = "lightblue") +
+  geom_sf(data = data_gpkg_intersected_2d, fill = "forestgreen") + 
+  geom_sf(data = data_gpkg_intersected_out_2d, fill = "lightgreen") + 
+  geom_sf(data = data_gpkg_intersected_out_2d_subset, fill = "pink") + 
+  scale_x_continuous(limits = c(73.5, 74.05)) + 
+  scale_y_continuous(limits = c(18.95, 19.25))
+```
+
+I repeat this for 20, 40, 60 and 80% and save the outputs (executed offline).
+
+```{r eval=FALSE, echo= TRUE}
+
+area_percentage_aim = c(0.2, 0.4, 0.6, 0.8, 1.0)
+names_file = c("02", "04", "06", "08", "1")
+total_area_aim = total_area * area_percentage_aim
+
+lapply(1:5, function(x){
+  ind_out <- forest_areas_perm_ind[forest_areas_perm_cumsum <= total_area_aim[x]]
+  data_gpkg_intersected_out_2d_subset <- data_gpkg_intersected_out_2d[ind_out]
+  st_write(data_gpkg_intersected_out_2d_subset, paste0(c("out/forest_", names_file[x], ".gpkg"), collapse = ""))
+})
+  
+```
+## Prioritised subsetting of CFRA forests
