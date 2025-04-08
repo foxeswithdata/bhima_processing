@@ -7,27 +7,29 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file(),
-                     knitr.digits.signif = TRUE)
+# knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file(),
+#                      knitr.digits.signif = TRUE)
 
 options(stringsAsFactors = FALSE)
 library(raster)
 library(tidyverse)
-library(inborutils)
+# library(inborutils)
 library(sf)
 library(terra)
 library(gtools)
+
+set.seed(0110)
 ```
 
 ## The Problem
 
-In this document I describe the process of generating aforestation maps for the Bhima Upper Basin Ghod Sub-basin. 
-First we examine the Ghod Sub-basin and it's current aforestation. 
+In this document I describe the process of generating afforestation maps for the Bhima Upper Basin Ghod Sub-basin. 
+First we examine the Ghod Sub-basin and it's current afforestation. 
 
 Load Ghod Sub-basin region
 
 ```{r ghod_subbasin_mask}
-data_gpkg_region <- sf::read_sf("data/maps/region.gpkg")
+data_gpkg_region <- sf::read_sf("../data/maps/region.gpkg")
 data_gpkg_region_2d <- st_zm(data_gpkg_region$geom)
 
 ggplot() + 
@@ -45,10 +47,10 @@ Get current aforestation (raster), subset to just forests and convert to shapes.
 
 
 ```{r print_land_use}
-useclass_gpkg <- rast("data/maps/land_use_classes.tif")
+useclass_gpkg <- rast("../data/maps/land_use_classes.tif")
 
 ## Forest area is under 0 so we make everything else NA
-current_forest2 <- sf::read_sf("out/current_forest.shp")
+current_forest2 <- sf::read_sf("../out/current_forest.shp")
 
 ggplot() +
   geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") + 
@@ -64,7 +66,7 @@ Current afforestation is `r sum(st_area(current_forest2))` m2 which is: `r 100 *
 Now, I examine the aforestation from the CFRA regions (dark grey) and subset to only the Ghod Subbasin (light grey). 
 
 ```{r}
-data_gpkg <- sf::read_sf("data/maps/junnar_potential_CFR.gpkg")
+data_gpkg <- sf::read_sf("../data/maps/junnar_potential_CFR.gpkg")
 data_gpkg_2d <- st_zm(data_gpkg$geom)
 
 # Extract forests only in modelled area
@@ -147,4 +149,36 @@ lapply(1:5, function(x){
 })
   
 ```
+
 ## Prioritised subsetting of CFRA forests
+
+For each potential area for afforestation, we calculate the distance to the closest current forest. 
+```{r}
+
+# # for each potential area, calculate the distance to the closest current forest
+# m_to_forest0 <- lapply(1:length(data_gpkg_intersected_out_2d), function(x){
+#       distance_to_forest <- st_distance(data_gpkg_intersected_out_2d[x], st_union(current_forest2))
+#     })
+# saveRDS(m_to_forest0, "../out/m_to_forest0.rds")
+
+# read RDS (output from code above)
+m_to_forest0 <- readRDS("../out/m_to_forest0.rds")
+
+#save only the distance to nearest forest
+m_to_forest <- lapply(1:length(data_gpkg_intersected_out_2d), function(x){
+  m_to_forest0[[x]][1]
+})
+
+# turn into a data frame
+m_to_forest_df0 <- do.call(rbind.data.frame, m_to_forest)
+colnames(m_to_forest_df0) <- "distance_m"
+
+# add an index based on order of distance
+
+m_to_forest_df <- m_to_forest_df0 %>% 
+  mutate(position = row_number(-distance_m))
+
+table(m_to_forest_df$distance_m)
+```
+
+Above, we see that `r table(m_to_forest_df$distance_m)[1]` out of `r length(data_gpkg_intersected_out_2d)` polygons of potential afforestation locations are 0 meters away from current forest cells, and the maximum distance is around 550 meters away. We have thus decided to randomly assign polygons for the afforestation scenarios. 
