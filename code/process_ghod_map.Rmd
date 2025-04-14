@@ -145,7 +145,7 @@ total_area_aim = total_area * area_percentage_aim
 lapply(1:5, function(x){
   ind_out <- forest_areas_perm_ind[forest_areas_perm_cumsum <= total_area_aim[x]]
   data_gpkg_intersected_out_2d_subset <- data_gpkg_intersected_out_2d[ind_out]
-  st_write(data_gpkg_intersected_out_2d_subset, paste0(c("out/forest_", names_file[x], ".gpkg"), collapse = ""))
+  st_write(data_gpkg_intersected_out_2d_subset, paste0(c("../out/forest_", names_file[x], ".gpkg"), collapse = ""))
 })
   
 ```

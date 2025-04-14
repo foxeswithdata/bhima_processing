@@ -473,7 +473,7 @@ total_area_aim = total_area * area_percentage_aim
 lapply(1:5, function(x){
   ind_out &lt;- forest_areas_perm_ind[forest_areas_perm_cumsum &lt;= total_area_aim[x]]
   data_gpkg_intersected_out_2d_subset &lt;- data_gpkg_intersected_out_2d[ind_out]
-  st_write(data_gpkg_intersected_out_2d_subset, paste0(c(&quot;out/forest_&quot;, names_file[x], &quot;.gpkg&quot;), collapse = &quot;&quot;))
+  st_write(data_gpkg_intersected_out_2d_subset, paste0(c(&quot;../out/forest_&quot;, names_file[x], &quot;.gpkg&quot;), collapse = &quot;&quot;))
 })</code></pre>
 </div>
 <div id="prioritised-subsetting-of-cfra-forests" class="section level2">
