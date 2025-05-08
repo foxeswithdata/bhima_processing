@@ -17,6 +17,7 @@ library(tidyverse)
 library(sf)
 library(terra)
 library(gtools)
+library(ggpubr)
 
 set.seed(0110)
 ```
@@ -149,6 +150,88 @@ lapply(1:5, function(x){
 })
   
 ```
+
+Plotting the potential areas for each afforestation scenario. The pink areas correspond to the areas selected for afforestation, and the bright green are the remainder of the potential areas for reforestation. The dark greay are the current forest areas. 
+
+```{r, fig.height= 7.08, fig.width=14.87}
+data_gpkg_forest_02 <- sf::read_sf("../out/forest_02.gpkg")
+forest_02 <- st_zm(data_gpkg_forest_02$geom)
+
+data_gpkg_forest_04 <- sf::read_sf("../out/forest_04.gpkg")
+forest_04 <- st_zm(data_gpkg_forest_04$geom)
+
+data_gpkg_forest_06 <- sf::read_sf("../out/forest_06.gpkg")
+forest_06 <- st_zm(data_gpkg_forest_06$geom)
+
+data_gpkg_forest_08 <- sf::read_sf("../out/forest_08.gpkg")
+forest_08 <- st_zm(data_gpkg_forest_08$geom)
+
+data_gpkg_forest_1 <- sf::read_sf("../out/forest_1.gpkg")
+forest_1 <- st_zm(data_gpkg_forest_1$geom)
+
+
+plot_02 <- ggplot() +
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") +
+  geom_sf(data = current_forest2, fill = "forestgreen", alpha = 0) +
+  geom_sf(data = data_gpkg_intersected_out_2d, fill= "lightgreen") + 
+  geom_sf(data = forest_02, fill = "pink") +
+  scale_x_continuous(limits = c(73.5, 74.05)) + 
+  scale_y_continuous(limits = c(18.95, 19.25)) +
+  labs(title = "20 %", hjust = 0.5)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+plot_04 <- ggplot() +
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") +
+  geom_sf(data = current_forest2, fill = "forestgreen", alpha = 0) +
+  geom_sf(data = data_gpkg_intersected_out_2d, fill= "lightgreen") + 
+  geom_sf(data = forest_04, fill = "pink") +
+  scale_x_continuous(limits = c(73.5, 74.05)) + 
+  scale_y_continuous(limits = c(18.95, 19.25)) +
+  labs(title = "40 %", hjust = 0.5)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+plot_06 <- ggplot() +
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") +
+  geom_sf(data = current_forest2, fill = "forestgreen", alpha = 0) +
+  geom_sf(data = data_gpkg_intersected_out_2d, fill= "lightgreen") + 
+  geom_sf(data = forest_06, fill = "pink") +
+  scale_x_continuous(limits = c(73.5, 74.05)) + 
+  scale_y_continuous(limits = c(18.95, 19.25)) +
+  labs(title = "60 %", hjust = 0.5)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+plot_08 <- ggplot() +
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") +
+  geom_sf(data = current_forest2, fill = "forestgreen", alpha = 0) +
+  geom_sf(data = data_gpkg_intersected_out_2d, fill= "lightgreen") + 
+  geom_sf(data = forest_08, fill = "pink") +
+  scale_x_continuous(limits = c(73.5, 74.05)) + 
+  scale_y_continuous(limits = c(18.95, 19.25)) +
+  labs(title = "80 %", hjust = 0.5)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+plot_1 <- ggplot() +
+  geom_sf(data = data_gpkg_region_2d, fill = "lightgrey") +
+  geom_sf(data = current_forest2, fill = "forestgreen", alpha = 0) +
+  geom_sf(data = data_gpkg_intersected_out_2d, fill= "lightgreen") + 
+  geom_sf(data = forest_1, fill = "pink") +
+  scale_x_continuous(limits = c(73.5, 74.05)) + 
+  scale_y_continuous(limits = c(18.95, 19.25)) +
+  labs(title = "100 %", hjust = 0.5)+
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+# afforestation_plots <- ggarrange(plot_02, plot_04, plot_06, plot_08, plot_1, 
+#                                        ncol = 3, nrow = 2)
+
+
+plot_02
+plot_04
+plot_06
+plot_08
+plot_1
+```
+
 
 ## Prioritised subsetting of CFRA forests
 
