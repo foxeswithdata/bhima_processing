@@ -265,3 +265,8 @@ table(m_to_forest_df$distance_m)
 ```
 
 Above, we see that `r table(m_to_forest_df$distance_m)[1]` out of `r length(data_gpkg_intersected_out_2d)` polygons of potential afforestation locations are 0 meters away from current forest cells, and the maximum distance is around 550 meters away. We have thus decided to randomly assign polygons for the afforestation scenarios. 
+
+```{r}
+# st_write(data_gpkg_region, "../data/maps/region.shp")
+```
+
