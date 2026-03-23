@@ -15,6 +15,17 @@ spinup_run = False
 
 ghod_region = gpd.read_file("data/maps/region.gpkg")
 
+soil_data_filename = "data/" + "soil_layer_forest_height_m_m.zarr"
+da_zarr_soil = xr.open_zarr(soil_data_filename, consolidated=False)
+da_zarr_soil.rio.write_crs(ghod_region.crs, inplace=True)
+da_zarr_soil = da_zarr_soil.rio.clip(
+    ghod_region.geometry,
+    ghod_region.crs,
+    drop=True
+)
+
+da_zarr_soil = da_zarr_soil.mean(dim=["time"])
+
 ### STEP 3 data
 
 data_folder = "data/ssp3_out/"
@@ -48,9 +59,9 @@ outputs_all_df = pd.DataFrame(data = {'file_name': all_outputs,
                                   'scale': np.concat([np.repeat("forest", 3), np.repeat("plantfate", 5)]),
                                   'variable': ['groundwater_recharge', 'soil_moisture', 'transpiration',
                                               'groundwater_recharge', 'soil_moisture', 'transpiration',  'biomass', 'NPP'],
-                                      'title': ['Groundwater Recharge', 'Soil Moisture', 'Transpiration',
-                                              'Groundwater Recharge', 'Soil Moisture', 'Transpiration',  'Biomass', 'NPP'],
-                                      'unit': ['m', 'm', 'kgC/m2/day', 'm', 'm', 'kgC/m2/day', "kgC", "kgC/m2/day"]
+                                      'title': ['Groundwater Recharge', 'Normalized Soil Moisture', 'Transpiration',
+                                              'Groundwater Recharge', 'Normalized Soil Moisture', 'Transpiration',  'Biomass', 'NPP'],
+                                      'unit': ['m', 'm/m', 'kgC/m2/day', 'm', 'm/m', 'kgC/m2/day', "kgC", "kgC/m2/day"]
                                       })
 outputs_df = outputs_all_df
 
@@ -66,6 +77,8 @@ if spinup_run:
 grid_area = 817398.837317795
 non_summable = ["soil_moisture", "biomass"]
 
+outputs_df = outputs_df.iloc[2:8,:]
+
 for index_o, row_o in outputs_df.iterrows():
     for index, row in sim_df_sub.iterrows():
         print("Running " + row_o['variable'] + " " + row_o['scale'] + " in " + row['file_name'])
@@ -79,7 +92,10 @@ for index_o, row_o in outputs_df.iterrows():
             if not (os.path.exists(figure_directory_run)):
                 os.makedirs(figure_directory_run)
 
+
+
             da_zarr = xr.open_zarr(filename, consolidated=False)
+
             da_zarr.rio.write_crs(ghod_region.crs, inplace=True)
             da_zarr = da_zarr.rio.clip(
                 ghod_region.geometry,
@@ -87,10 +103,15 @@ for index_o, row_o in outputs_df.iterrows():
                 drop=True
             )
 
+            if row_o['variable'] == "soil_moisture":
+                da_zarr = da_zarr['soil_moisture_forest_m'] / da_zarr_soil['soil_layer_forest_height_m_m']
+
             ## Yearly Average
             yearly_data = da_zarr.sel(time=slice(str(year + "-01-01"), str(year + "-12-31"))).mean(dim=["time"])
-            da_yearly_data = yearly_data[list(yearly_data.keys())[0]]
-            da_yearly_data = da_yearly_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
+            if row_o['variable'] != "soil_moisture":
+                yearly_data = yearly_data.to_dataarray()
+
+            da_yearly_data = yearly_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
 
             fig = da_yearly_data.plot().figure
             plt.title(str("Average Daily ") + row_o['scale'] + " " + row_o['title'] + " in " + year)
@@ -105,8 +126,9 @@ for index_o, row_o in outputs_df.iterrows():
 
             if not(row_o['variable'] in non_summable):
                 yearly_data = da_zarr.sel(time=slice(str(year + "-01-01"), str(year + "-12-31"))).sum(dim=["time"])
-                da_yearly_data = yearly_data[list(yearly_data.keys())[0]]
-                da_yearly_data = da_yearly_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
+                if row_o['variable'] != "soil_moisture":
+                    yearly_data = yearly_data.to_dataarray()
+                da_yearly_data = yearly_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
 
                 fig = da_yearly_data.plot().figure
                 plt.title(str("Total Annual ") + row_o['scale'] + " " + row_o['title'] + " in " + year)
@@ -119,8 +141,9 @@ for index_o, row_o in outputs_df.iterrows():
 
             ## Monthly Average
             monthly_data = da_zarr.sel(time=slice(str(year + "-01-01"), str(year + "-12-31"))).groupby("time.month").mean(dim=["time"])
-            da_monthly_data = monthly_data[list(yearly_data.keys())[0]]
-            da_monthly_data = da_monthly_data.assign_attrs(long_name=row_o['title'], units=row_o['unit'])
+            if row_o['variable'] != "soil_moisture":
+                monthly_data = monthly_data.to_dataarray()
+            da_monthly_data = monthly_data.assign_attrs(long_name=row_o['title'], units=row_o['unit'])
 
             fig_facet = da_monthly_data.plot(x="x", y="y", col="month", col_wrap=3)
 
@@ -134,8 +157,9 @@ for index_o, row_o in outputs_df.iterrows():
             if not(row_o['variable'] in non_summable):
                 monthly_data = da_zarr.sel(time=slice(str(year + "-01-01"), str(year + "-12-31"))).groupby("time.month").sum(
                     dim=["time"])
-                da_monthly_data = monthly_data[list(yearly_data.keys())[0]]
-                da_monthly_data = da_monthly_data.assign_attrs(long_name=row_o['title'], units=row_o['unit'])
+                if row_o['variable'] != "soil_moisture":
+                    monthly_data = monthly_data.to_dataarray()
+                da_monthly_data = monthly_data.assign_attrs(long_name=row_o['title'], units=row_o['unit'])
 
                 fig_facet = da_monthly_data.plot(x="x", y="y", col="month", col_wrap=3)
                 figure_directory_run = str(figure_directory + row['file_name'] + "/")
@@ -149,8 +173,9 @@ for index_o, row_o in outputs_df.iterrows():
 
             ## Monsoon Average
             monsoon_data = da_zarr.sel(time=slice(str(year + "-06-01"), str(year + "-08-31"))).mean(dim=["time"])
-            da_monsoon_data = monsoon_data[list(monsoon_data.keys())[0]]
-            da_monsoon_data = da_monsoon_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
+            if row_o['variable'] != "soil_moisture":
+                monsoon_data = monsoon_data.to_dataarray()
+            da_monsoon_data = monsoon_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
 
             fig = da_monsoon_data.plot().figure
             plt.title(str("Monsoon Season (June-August) Average Daily ") + row_o['scale'] + " " + row_o['title'] + " in " + year)
@@ -166,8 +191,9 @@ for index_o, row_o in outputs_df.iterrows():
 
             if not (row_o['variable'] in non_summable):
                 monsoon_data = da_zarr.sel(time=slice(str(year + "-06-01"), str(year + "-08-31"))).sum(dim=["time"])
-                da_monsoon_data = monsoon_data[list(monsoon_data.keys())[0]]
-                da_monsoon_data = da_monsoon_data.assign_attrs(long_name=row_o['title'], unit=row_o['unit'])
+                if row_o['variable'] != "soil_moisture":
+                    monsoon_data = monsoon_data.to_dataarray()
+                da_monsoon_data = monsoon_data.assign_attrs(long_name=row_o['title'], unit=row_o['unit'])
 
                 fig = da_monsoon_data.plot().figure
                 plt.title(str("Monsoon Season (June-August) Total ") + row_o['scale'] + " " + row_o[
@@ -185,8 +211,9 @@ for index_o, row_o in outputs_df.iterrows():
 
             ## Dry season Average
             dry_season_data = da_zarr.sel(time=slice(str(year + "-01-01"), str(year + "-03-31"))).mean(dim=["time"])
-            da_dry_season_data = dry_season_data[list(dry_season_data.keys())[0]]
-            da_dry_season_data = da_dry_season_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
+            if row_o['variable'] != "soil_moisture":
+                dry_season_data = dry_season_data.to_dataarray()
+            da_dry_season_data = dry_season_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
 
             fig = da_dry_season_data.plot().figure
             plt.title(str("Dry Season Average Daily ") + row_o['scale'] + " " + row_o['title'] + " in " + year)
@@ -202,8 +229,9 @@ for index_o, row_o in outputs_df.iterrows():
 
             if not (row_o['variable'] in non_summable):
                 dry_season_data = da_zarr.sel(time=slice(str(year + "-01-01"), str(year + "-03-31"))).sum(dim=["time"])
-                da_dry_season_data = dry_season_data[list(dry_season_data.keys())[0]]
-                da_dry_season_data = da_dry_season_data.assign_attrs(long_name=row_o['title'], unit=row_o['unit'])
+                if row_o['variable'] != "soil_moisture":
+                    dry_season_data = dry_season_data.to_dataarray()
+                da_dry_season_data = dry_season_data.assign_attrs(long_name=row_o['title'], unit=row_o['unit'])
 
                 fig = da_dry_season_data.plot().figure
                 plt.title(str("Dry Season (Jan-March) Total ") + row_o['scale'] + " " + row_o[
@@ -220,8 +248,9 @@ for index_o, row_o in outputs_df.iterrows():
 
             ## Monsoon Day
             monsoon_data = da_zarr.sel(time=str(year + "-07-15"))
-            da_monsoon_data = monsoon_data[list(monsoon_data.keys())[0]]
-            da_monsoon_data = da_monsoon_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
+            if row_o['variable'] != "soil_moisture":
+                monsoon_data = monsoon_data.to_dataarray()
+            da_monsoon_data = monsoon_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
 
             fig = da_monsoon_data.plot().figure
             plt.title(str("Monsoon Season ") + row_o['scale'] + " " + row_o['title'] + "15.07." + year)
@@ -237,8 +266,9 @@ for index_o, row_o in outputs_df.iterrows():
 
             ## Dry season Average
             dry_season_data = da_zarr.sel(time=str(year + "-02-01"))
-            da_dry_season_data = dry_season_data[list(dry_season_data.keys())[0]]
-            da_dry_season_data = da_dry_season_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
+            if row_o['variable'] != "soil_moisture":
+                dry_season_data = dry_season_data.to_dataarray()
+            da_dry_season_data = dry_season_data.assign_attrs(long_name = row_o['title'], unit = row_o['unit'])
 
             fig = da_dry_season_data.plot().figure
             plt.title(str("Dry Season ") + row_o['scale'] + " " + row_o['title'] + "01.02." + year)
