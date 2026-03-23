@@ -17,12 +17,9 @@ data <- data.frame(filename = parameters,
 figure_dir = "out/ssp3/figures/spinup/"
 
 ### Forest averages
-
-
 for (n in 1:nrow(data)){
   
   #Process yearly data
-  
   param_yearly = read.csv(paste0("out/ssp3_preproc/spinup/", data$filename[n], "_forest_average_yearly.csv", sep = ""))
   colnames(param_yearly)[2] <- "var"
   
@@ -34,18 +31,53 @@ for (n in 1:nrow(data)){
     ylab(data$yaxis[n])
   p
   
-  file_figure <- tempfile(paste(data$filename[n], "annual", "average", "forest", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n], "annual", "average", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
+  param_yearly_one_to_one_hb <- param_yearly %>%
+    filter(biodiversity %in% c("na", "high")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "high") %>%
+    select(-one_of(c("spatial_ref", "crs")))
   
+  param_yearly_one_to_one_lb <- param_yearly %>%
+    filter(biodiversity %in% c("na", "low")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "low") %>%
+    select(-one_of(c("spatial_ref", "crs")))
+  
+  colnames(param_yearly_one_to_one_hb)[c(2,3)] <- c("GEB", "PlantFATE") 
+  colnames(param_yearly_one_to_one_lb)[c(2,3)] <- c("GEB", "PlantFATE") 
+  
+  param_yearly_one_to_one <- rbind(param_yearly_one_to_one_hb, param_yearly_one_to_one_lb)
+  one_to_one_line <- data.frame(x = c(min(param_yearly_one_to_one$GEB), max(param_yearly_one_to_one$GEB)),
+                                y = c(min(param_yearly_one_to_one$PlantFATE), max(param_yearly_one_to_one$PlantFATE)))
+  
+  
+  p <- ggplot(param_yearly_one_to_one, aes(x = GEB, y = PlantFATE)) + 
+    geom_line(data = one_to_one_line, aes(x = x, y = y), linetype = "dashed", alpha = 0.75) + 
+    geom_point(alpha = 0.7) +
+    facet_wrap(~biodiversity) + 
+    ggtitle(paste0("1-to-1 line yearly Forest ", data$name[n],  sep = ""))
+  p
+  
+  filename_figure = paste(data$filename[n], "annual", "one_to_one", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
+         scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
+         units =  "mm")
   
   #Process monthly data
   param_monthly = read.csv(paste0("out/ssp3_preproc/spinup/", data$filename[n], "_forest_average_monthly.csv", sep = "")) 
   param_monthly <- param_monthly %>%
     mutate(my_date = paste(15, month, year, sep = '-')) %>% 
-    mutate(my_date = as.Date(my_date, format = '%d-%m-%Y', origin = '1970-01-01'))
+    mutate(my_date = as.Date(my_date, format = '%d-%m-%Y', origin = '1970-01-01')) %>%
+    select(-one_of(c("spatial_ref", "crs")))
   colnames(param_monthly)[3] <- "var"
   
   p <- ggplot(param_monthly, aes(x = my_date, y = var, 
@@ -56,8 +88,42 @@ for (n in 1:nrow(data)){
     ylab(data$yaxis[n])
   p
   
-  file_figure <- tempfile(paste(data$filename[n], "monthly", "average", "forest", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n], "monthly", "average", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
+         scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
+         units =  "mm")
+  
+  param_monthly_one_to_one_hb <- param_monthly %>%
+    filter(biodiversity %in% c("na", "high")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "high")
+  
+  param_monthly_one_to_one_lb <- param_monthly %>%
+    filter(biodiversity %in% c("na", "low")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "low")
+  
+  colnames(param_monthly_one_to_one_hb)[c(4,5)] <- c("GEB", "PlantFATE") 
+  colnames(param_monthly_one_to_one_lb)[c(4,5)] <- c("GEB", "PlantFATE") 
+  
+  param_monthly_one_to_one <- rbind(param_monthly_one_to_one_hb, param_monthly_one_to_one_lb)
+  one_to_one_line <- data.frame(x = c(min(param_monthly_one_to_one$GEB), max(param_monthly_one_to_one$GEB)),
+                                y = c(min(param_monthly_one_to_one$PlantFATE), max(param_monthly_one_to_one$PlantFATE)))
+  
+  
+  p <- ggplot(param_monthly_one_to_one, aes(x = GEB, y = PlantFATE)) + 
+    geom_line(data = one_to_one_line, aes(x = x, y = y), linetype = "dashed", alpha = 0.75) + 
+    geom_point(alpha = 0.5) +
+    facet_wrap(~biodiversity) + 
+    ggtitle(paste0("1-to-1 line monthly Forest ", data$name[n],  sep = ""))
+  p
+  
+  filename_figure = paste(data$filename[n], "monthly", "one_to_one", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
@@ -74,8 +140,77 @@ for (n in 1:nrow(data)){
     ylab(data$yaxis[n])
   p
   
-  file_figure <- tempfile(paste(data$filename[n], "rolling_14_day", "average", "forest", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n], "rolling_14_day", "average", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
+         scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
+         units =  "mm")
+  
+  param_daily_rolling_one_to_one_hb <- param_roll_daily %>%
+    filter(biodiversity %in% c("na", "high")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "high") 
+  
+  param_daily_rolling_one_to_one_lb <- param_roll_daily %>%
+    filter(biodiversity %in% c("na", "low")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "low") 
+  
+  colnames(param_daily_rolling_one_to_one_hb)[c(2,3)] <- c("GEB", "PlantFATE") 
+  colnames(param_daily_rolling_one_to_one_lb)[c(2,3)] <- c("GEB", "PlantFATE") 
+  
+  param_daily_rolling_one_to_one <- rbind(param_daily_rolling_one_to_one_hb, param_daily_rolling_one_to_one_lb)
+  one_to_one_line <- data.frame(x = c(min(param_daily_rolling_one_to_one$GEB, na.rm = TRUE), max(param_daily_rolling_one_to_one$GEB,  na.rm = TRUE)),
+                                y = c(min(param_daily_rolling_one_to_one$PlantFATE,  na.rm = TRUE), max(param_daily_rolling_one_to_one$PlantFATE,  na.rm = TRUE)))
+  
+  p <- ggplot(param_daily_rolling_one_to_one, aes(x = GEB, y = PlantFATE)) + 
+    geom_line(data = one_to_one_line, aes(x = x, y = y), linetype = "dashed") + 
+    geom_point(alpha = 0.05) +
+    facet_wrap(~biodiversity) + 
+    ggtitle(paste0("1-to-1 line Daily Rolling Average Forest ", data$name[n],  sep = ""))
+  p
+  
+  filename_figure = paste(data$filename[n], "rolling_daily", "one_to_one", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
+         scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
+         units =  "mm")
+  
+  #Process average daily data
+  param_daily = read.csv(paste0("out/ssp3_preproc/spinup/", data$filename[n], "_forest_average_daily.csv", sep = ""))
+  param_daily <- param_daily[,c(1, 4:ncol(param_daily))]
+  colnames(param_daily)[2] <- "var"
+  
+  param_daily_one_to_one_hb <- param_daily %>%
+    filter(biodiversity %in% c("na", "high")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "high") 
+  
+  param_daily_one_to_one_lb <- param_daily %>%
+    filter(biodiversity %in% c("na", "low")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "low") 
+  
+  colnames(param_daily_one_to_one_hb)[c(2,3)] <- c("GEB", "PlantFATE") 
+  colnames(param_daily_one_to_one_lb)[c(2,3)] <- c("GEB", "PlantFATE") 
+  
+  param_daily_one_to_one <- rbind(param_daily_one_to_one_hb, param_daily_one_to_one_lb)
+  one_to_one_line <- data.frame(x = c(min(param_daily_one_to_one$GEB, na.rm = TRUE), max(param_daily_one_to_one$GEB,  na.rm = TRUE)),
+                                y = c(min(param_daily_one_to_one$PlantFATE,  na.rm = TRUE), max(param_daily_one_to_one$PlantFATE,  na.rm = TRUE)))
+  
+  p <- ggplot(param_daily_one_to_one, aes(x = GEB, y = PlantFATE)) + 
+    geom_line(data = one_to_one_line, aes(x = x, y = y), linetype = "dashed") + 
+    geom_point(alpha = 0.05) +
+    facet_wrap(~biodiversity) + 
+    ggtitle(paste0("1-to-1 line Daily Average Forest ", data$name[n],  sep = ""))
+  p
+  
+  filename_figure = paste(data$filename[n], "daily", "one_to_one", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
@@ -93,8 +228,10 @@ for (n in 1:nrow(data)){
     ylab(data$yaxis[n])
   p
   
-  file_figure <- tempfile(paste(data$filename[n], "monsoon", "average", "forest", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n], "monsoon", "average", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
@@ -112,8 +249,10 @@ for (n in 1:nrow(data)){
     ylab(data$yaxis[n])
   p
   
-  file_figure <- tempfile(paste(data$filename[n], "dry_season", "average", "forest", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n], "dry_season", "average", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
 }
@@ -127,21 +266,24 @@ data <- data.frame(filename = parameters,
                    name = c("Biomass", "Transpiration", "NPP"),
                    yaxis = c("Biomass kgC", "Transpiration (kgH20/day)", "NPP kgC/day"))
 
-
 for (n in 1:nrow(data)){
   
   #Process daily data
   param_daily = read.csv(paste0("out/ssp3_preproc/spinup/", data$filename[n], "_plantfate_basin_sum_daily.csv", sep = "")) %>%
     drop_na()
-  param_daily <- param_daily[2:nrow(param_daily),c(1, 4:ncol(param_daily))]
+  param_daily <- param_daily %>%
+    select(-c("spatial_ref", "crs"))
   colnames(param_daily)[2] <- "var"
+  param_daily <- param_daily %>%
+    dplyr::filter(var != 0)
   
   yaxis = paste(data$yaxis[n], "per day")
   if(data$filename[n] == "biomass"){
     yaxis = data$yaxis[n]
   }
   
-  p <- ggplot(param_daily, aes(x = as.Date(time), y = var, 
+  p <- ggplot(param_daily, aes(x = as.Date(time), 
+                               y = var, 
                                color = biodiversity)) + 
     geom_line() + 
     ggtitle(paste0("Total Forest Daily ", data$name[n],  sep = "")) + 
@@ -149,8 +291,10 @@ for (n in 1:nrow(data)){
     ylab(yaxis)
   p
   
-  file_figure <- tempfile(paste(data$filename[n],"daily", "sum", "plantfate", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n],"daily", "sum", "plantfate", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
@@ -161,7 +305,7 @@ for (n in 1:nrow(data)){
            mnth = month(time)) %>%
     group_by(yr, mnth, biodiversity) %>%
     summarise(summed = sum(var)) %>%
-    mutate(time = as.Date(paste(15, mnth, yr, sep = "-")))
+    mutate(time = as.Date(paste(15, mnth, yr, sep = "-"), format = "%d-%m-%Y"))
   
   yaxis = paste(data$yaxis[n], "per month")
   if(data$filename[n] == "biomass"){
@@ -176,8 +320,10 @@ for (n in 1:nrow(data)){
     ylab(yaxis)
   p
   
-  file_figure <- tempfile(paste(data$filename[n], "monthly", "sum", "plantfate", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n], "monthly", "sum", "plantfate", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
@@ -201,8 +347,10 @@ for (n in 1:nrow(data)){
     ylab(yaxis)
   p
   
-  file_figure <- tempfile(paste(data$filename[n], "yearly", "sum", "plantfate", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n], "yearly", "sum", "plantfate", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
@@ -217,6 +365,7 @@ for (n in 1:nrow(data)){
     yaxis = data$yaxis[n]
   }
   
+  
   p <- ggplot(param_roll_daily, aes(x = as.Date(time), y = var, 
                                     color = biodiversity)) + 
     geom_line() + 
@@ -225,8 +374,10 @@ for (n in 1:nrow(data)){
     ylab(yaxis)
   p
   
-  file_figure <- tempfile(paste(data$filename[n], "rolling_14_day", "sum", "forest", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename[n], "rolling_14_day", "sum", "forest", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
 }
@@ -237,7 +388,7 @@ dirs <- list.dirs(path = "data/ssp3_out", recursive = FALSE)
 dirs <- dirs[grep("GEB_step3_", dirs)]
 
 dirs_df <- data.frame(dir = dirs,
-                      biodiversity = c("no PF", "high", "low"))
+                      biodiversity = c("na", "high", "low"))
 
 csv_names <- c("hydrology.landcover/runoff_weighted_mean_m.csv", 
                "hydrology.soil/soil_moisture_weighted_mean_m.csv",
@@ -269,8 +420,41 @@ for (n in 1:nrow(data)){
     ylab(data$yaxis[n])
   p
   
-  file_figure <- tempfile(paste(data$filename_out[n], "daily", "average", "basin", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename_out[n], "daily", "average", "basin", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
+         scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
+         units =  "mm")
+  
+  param_daily_one_to_one_hb <- out_data %>%
+    filter(biodiversity %in% c("na", "high")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    dplyr::mutate(biodiversity = "high") 
+  
+  param_daily_one_to_one_lb <- out_data %>%
+    filter(biodiversity %in% c("na", "low")) %>%
+    pivot_wider(values_from = var, names_from = biodiversity) %>%
+    mutate(biodiversity = "low")
+  
+  colnames(param_daily_one_to_one_hb)[c(2,3)] <- c("GEB", "PlantFATE") 
+  colnames(param_daily_one_to_one_lb)[c(2,3)] <- c("GEB", "PlantFATE") 
+  
+  param_daily_one_to_one <- rbind(param_daily_one_to_one_hb, param_daily_one_to_one_lb)
+  one_to_one_line <- data.frame(x = c(min(param_daily_one_to_one$GEB), max(param_daily_one_to_one$GEB)),
+                                y = c(min(param_daily_one_to_one$PlantFATE), max(param_daily_one_to_one$PlantFATE)))
+  
+  p <- ggplot(param_daily_one_to_one, aes(x = GEB, y = PlantFATE)) + 
+    geom_line(data = one_to_one_line, aes(x = x, y = y), linetype = "dashed", alpha = 0.75) + 
+    geom_point(alpha = 0.7) +
+    facet_wrap(~biodiversity) + 
+    ggtitle(paste0("1-to-1 line yearly Basin ", data$name[n],  sep = ""))
+  p
+  
+  filename_figure = paste(data$filename_out[n], "daily", "one_to_one", "basin", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
@@ -281,23 +465,24 @@ for (n in 1:nrow(data)){
            mnth = month(date)) %>%
     group_by(yr, mnth, biodiversity) %>%
     summarise(avg = mean(var)) %>%
-    mutate(time = as.Date(paste(15, mnth, yr, sep = "-")))
+    mutate(time = as.Date(paste(15, mnth, yr, sep = "-"), format = "%d-%m-%Y"))
   
   p <- ggplot(param_monthly, aes(x = as.Date(time), y = avg, 
                                  color = biodiversity)) + 
     geom_line() + 
-    ggtitle(paste0("Average Forest Monthly ", data$name[n],  sep = "")) + 
+    ggtitle(paste0("Average Basin Monthly ", data$name[n],  sep = "")) + 
     xlab("Year") + 
     ylab(data$yaxis[n])
   p
   
-  file_figure <- tempfile(paste(data$filename_out[n], "monthly", "avg", "forest", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename_out[n], "monthly", "avg", "basin", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
   
   ### Yearly 
-  
   param_yearly <- out_data %>% 
     mutate(yr = year(date)) %>%
     group_by(yr, biodiversity) %>%
@@ -306,13 +491,15 @@ for (n in 1:nrow(data)){
   p <- ggplot(param_yearly, aes(x = yr, y = avg, 
                                 color = biodiversity)) + 
     geom_line() + 
-    ggtitle(paste0("Average Forest Yearly ", data$name[n],  sep = "")) + 
+    ggtitle(paste0("Average Basin Yearly ", data$name[n],  sep = "")) + 
     xlab("Year") + 
     ylab(data$yaxis[n])
   p
   
-  file_figure <- tempfile(paste(data$filename_out[n], "yearly", "avg", "forest", sep = "_"), tmpdir = figure_dir, fileext = ".png")
-  ggsave(file_figure, plot = p, device = NULL, path = NULL,
+  filename_figure = paste(data$filename_out[n], "yearly", "avg", "basin", sep = "_")
+  filename_figure = paste(filename_figure, "png", sep = ".")
+  filename_figure = file.path(figure_dir, filename_figure)
+  ggsave(filename_figure, plot = p, device = NULL, path = NULL,
          scale = 1, width = 190, height = 138, dpi = 300, limitsize = TRUE,
          units =  "mm")
 }  

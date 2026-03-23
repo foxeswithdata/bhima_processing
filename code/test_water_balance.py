@@ -1,4 +1,5 @@
 import numpy
+import xarray as xr
 
 
 
@@ -27,3 +28,5 @@ for layer in range(N_SOIL_LAYERS):
     plantfate_transpiration_by_layer[layer] = plantfate_transpiration * (
                 total_water_by_layer[layer] / total_water_by_layer.sum())
     print(plantfate_transpiration_by_layer)
+
+
