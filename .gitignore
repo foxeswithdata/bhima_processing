@@ -1,4 +1,33 @@
+# --- IDE ---
+.idea/
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+# --- Outputs ---
+/out/
+/test_plantFATE_out/output/
+/output/
+/simulation_root/
+
+# --- Zarr stores & archives (data lives on Zenodo) ---
+*.zarr/
+*.zarr.zip
+*.zip
+
+
+# --- HPC job logs ---
+slurm-*.out
+
+# --- Scratch exports / stray plots ---
+rstudio-export*/
+Rplot*.png
+
+# --- Data directory (archived on Zenodo, not shipped in the repo) ---
+/data/
+
+# --- Bulk model output under test_plantFATE_out (keep only scripts/config) ---
+/test_plantFATE_out/*
+!/test_plantFATE_out/*.py
+!/test_plantFATE_out/*.ini

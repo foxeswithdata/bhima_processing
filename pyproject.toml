@@ -1,0 +1,16 @@
+[project]
+name = "bhima-processing"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "cartopy>=0.25.0",
+    "geopandas>=1.1.1",
+    "matplotlib>=3.10.7",
+    "netcdf4>=1.7.3",
+    "pandas-stubs==2.3.2.250926",
+    "rioxarray>=0.20.0",
+    "xarray>=2025.10.1",
+    "zarr>=3.1.3",
+]

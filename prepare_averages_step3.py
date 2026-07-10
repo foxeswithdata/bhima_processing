@@ -10,7 +10,6 @@ import geopandas as gpd
 
 ghod_region = gpd.read_file("data/maps/region.gpkg")
 
-
 data_folder = "data/ssp3_out/"
 simulations = ["GEB_step3_default_spinup", "GEB_step3_plantfate_hb_spinup", "GEB_step3_plantfate_lb_spinup"]
 biodiversity = ["na", "high", "low"]
@@ -20,7 +19,7 @@ sim_df_step3 = pd.DataFrame(data = {'file_name': simulations,
 
 print(sim_df_step3)
 
-### STEP 4 data
+
 
 data_folder = "data/ssp3_out/"
 out_folder = 'out/ssp3_preproc/spinup/'
@@ -46,12 +45,22 @@ outputs_df = outputs_all_df.iloc[0:8, :]
 
 sim_df_sub = sim_df_step3
 
+soil_data_filename = "data/" + "soil_layer_height.zarr"
+da_zarr_soil = xr.open_zarr(soil_data_filename, consolidated=False)
+da_zarr_soil.rio.write_crs(ghod_region.crs, inplace=True)
+da_zarr_soil = da_zarr_soil.rio.clip(
+    ghod_region.geometry,
+    ghod_region.crs,
+    drop=True
+)
+
 for index_o, row_o in outputs_df.iterrows():
     aggregated_monthly = []
     aggregated_yearly = []
     aggregated_monsoon = []
     aggregated_dry = []
     aggregated_rolling = []
+    aggregated_daily = []
 
     for index, row in sim_df_sub.iterrows():
         filename = str(data_folder + row['file_name'] + "/hydrology.soil/" + row_o['file_name'] )
@@ -63,6 +72,11 @@ for index_o, row_o in outputs_df.iterrows():
                 ghod_region.crs,
                 drop=True
             )
+
+            if row_o['variable'] == "soil_moisture":
+                da_zarr = da_zarr / da_zarr_soil
+
+
             da_aggregated_monthly = da_zarr.groupby(["time.month", "time.year"]).mean(dim=["time", "x", "y"]).to_dataframe()
             da_aggregated_monthly['biodiversity'] = row['biodiversity']
             aggregated_monthly.append(da_aggregated_monthly)
@@ -85,6 +99,10 @@ for index_o, row_o in outputs_df.iterrows():
             da_aggregated_rolling['biodiversity'] = row['biodiversity']
             aggregated_rolling.append(da_aggregated_rolling)
 
+            da_aggregated_daily = da_zarr.mean(dim=["x", "y"]).to_dataframe()
+            da_aggregated_daily['biodiversity'] = row['biodiversity']
+            aggregated_daily.append(da_aggregated_daily)
+
         else:
             print(str("skipping " + filename))
 
@@ -104,7 +122,8 @@ for index_o, row_o in outputs_df.iterrows():
     filename = str(out_folder + row_o['variable'] + "_" + row_o['scale'] + "_rolling_average_14_days.csv")
     pd.concat(aggregated_rolling).to_csv(filename, index=True)
 
-
+    filename = str(out_folder + row_o['variable'] + "_" + row_o['scale'] + "_average_daily.csv")
+    pd.concat(aggregated_daily).to_csv(filename, index=True)
 
 ### PlantFATE totals
 

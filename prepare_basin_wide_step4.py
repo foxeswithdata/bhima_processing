@@ -17,7 +17,8 @@ outputs = ["groundwater_recharge_forest_m.zarr", "soil_moisture_forest_m.zarr", 
 outputs_pf = [ "groundwater_recharge_plantfate_m.zarr", "soil_moisture_plantfate_m.zarr", "transpiration_plantfate_m.zarr", "biomass_forest_plantFATE.zarr", "NPP_forest_plantFATE.zarr",]
 all_outputs = outputs + outputs_pf
 
-soil_data_filename = "data/" + "soil_layer_height.zarr"
+
+soil_data_filename = "data/" + "soil_layer_forest_height_m_m.zarr"
 da_zarr_soil = xr.open_zarr(soil_data_filename, consolidated=False)
 da_zarr_soil.rio.write_crs(ghod_region.crs, inplace=True)
 da_zarr_soil = da_zarr_soil.rio.clip(
@@ -25,6 +26,9 @@ da_zarr_soil = da_zarr_soil.rio.clip(
     ghod_region.crs,
     drop=True
 )
+
+da_zarr_soil = da_zarr_soil.mean(dim=["time"])
+
 
 sim_df = pd.DataFrame(data = {'file_name': simulations,
                               'afforestation': np.concat([afforestation, afforestation,  ["na"]]),
@@ -45,7 +49,7 @@ def is_later(year):
     return year >= 2031
 
 outputs = ["groundwater_recharge_forest_m.zarr"]
-outputs_df = outputs_all_df.iloc[1:2, :]
+outputs_df = outputs_all_df.iloc[2:3, :]
 
 sim_df_sub = sim_df
 
@@ -63,23 +67,19 @@ for index_o, row_o in outputs_df.iterrows():
                 drop=True
             )
 
-            if row_o['variable'] == "soil_moisture":
-                da_zarr = da_zarr / da_zarr_soil
-
-            print('converted soil')
-
-            print(da_zarr)
 
             da_zarr = da_zarr.sel(
                 time=is_later(da_zarr['time.year']))
 
             print('filtered time')
 
-            print(da_zarr)
+            if row_o['variable'] == "soil_moisture":
+                da_zarr = da_zarr['soil_moisture_forest_m'] / da_zarr_soil['soil_layer_forest_height_m_m']
+                da_zarr.rename('soil_moisture_forest_m')
+                da_aggregated_daily = da_zarr.to_dataframe(name=row_o["variable"])
+            else:
+                da_aggregated_daily = da_zarr.to_dataframe()
 
-            da_aggregated_daily = da_zarr.to_dataframe()
-
-            print('converted to dataframe')
 
             if isinstance(da_aggregated_daily.index, pd.MultiIndex):
                 da_aggregated_daily = da_aggregated_daily.reorder_levels(['time', 'y', 'x'])
@@ -93,7 +93,7 @@ for index_o, row_o in outputs_df.iterrows():
             da_aggregated_daily = da_aggregated_daily.drop('spatial_ref', axis=1)
             da_aggregated_daily = da_aggregated_daily.drop('crs', axis=1)
             da_aggregated_daily = da_aggregated_daily.dropna(axis=0)
-            # aggregated_daily.append(da_aggregated_daily)
+            aggregated_daily.append(da_aggregated_daily)
             filename = str(out_folder + row['biodiversity'] + row_o['variable'] + "_" + row_o['scale'] + "_daily.csv")
             da_aggregated_daily.to_csv(filename, index=True)
         else:
