@@ -10,7 +10,7 @@ Sys.setlocale("LC_ALL", "en_US.UTF-8")
 figure_dir = "out/figures_publication/"
 
 #### First figure - average yearly soil moisture
-soil_moisture_average_yearly = read.csv("out/ssp3_preproc/soil_moisture_forest_average_yearly.csv")
+soil_moisture_average_yearly = read.csv("out/ssp3/spatial_preprocessing/soil_moisture/soil_moisture_forest_average_yearly.csv")
 
 ## Rename values for printing
 soil_moisture_average_yearly$afforestation[soil_moisture_average_yearly$afforestation == "10.0"] <- "1.0"
@@ -35,7 +35,7 @@ p_annual
 
 ### Second figure
 
-soil_moisture_daily_average_2049 = read.csv("out/ssp3_preproc/soil_moisture_forest_rolling_average_14_days.csv") %>%
+soil_moisture_daily_average_2049 = read.csv("out/ssp3/spatial_preprocessing/soil_moisture/soil_moisture_forest_rolling_average_14_days.csv") %>%
   drop_na() %>%
   filter(as.Date(time) >= as.Date("01-01-2049", format= "%d-%m-%Y"))
 
@@ -59,7 +59,9 @@ p_2049 <- ggplot(soil_moisture_daily_average_2049, aes(x = as.Date(time), y = so
   scale_linetype_discrete("Biodiversity") +
   xlab("Time") +
   ylab(bquote('Normalized Soil Moisture [m'~m^-1~']')) + 
-  theme_bw()
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 p_2049
 
 

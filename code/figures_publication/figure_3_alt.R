@@ -10,7 +10,7 @@ figure_dir = "out/figures_publication/"
 
 ### Figure for NPP daily in 2049 total for plantfate forest
 
-NPP_daily_total_2049 = read.csv("out/ssp3_preproc/NPP_plantfate_basin_sum_daily_rolling.csv") %>%
+NPP_daily_total_2049 = read.csv("out/ssp3/spatial_preprocessing/NPP/NPP_plantfate_basin_sum_daily_rolling.csv") %>%
   drop_na() %>%
   filter(as.Date(time) >= as.Date("01-01-2049", format= "%d-%m-%Y"))
 
@@ -28,17 +28,18 @@ p_NPP_total <- ggplot(NPP_daily_total_2049, aes(x = as.Date(time), y = NPP_fores
                                       linetype = biodiversity,
                                       color = afforestation)) +
   geom_line() +
-  ggtitle(paste0("Total Basin Daily Forest Net Primary Productivity\n(Rolling 14-day Average)",  sep = "")) +
+  ggtitle(paste0("Total Basin Daily Forest \nNet Primary Productivity\n(Rolling 14-day Average)",  sep = "")) +
   scale_color_manual("Afforestation\nLevel", values = palette_colours[1:6]) +
   scale_linetype_discrete("Biodiversity") +
   xlab("Year") + 
   ylab(bquote('Net Primary Productivity [kgC'~d^-1~']')) + 
-  theme_bw()
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 p_NPP_total
 
 ### NPP average forest NPP 
 
-NPP_daily_ave_2049 = read.csv("out/ssp3_preproc/NPP_forest_plantFATE_plantfate_rolling_average_14_days.csv") %>%
+NPP_daily_ave_2049 = read.csv("out/ssp3/spatial_preprocessing/NPP/NPP_plantfate_rolling_average_14_days.csv") %>%
   drop_na() %>%
   filter(as.Date(time) >= as.Date("01-01-2049", format= "%d-%m-%Y"))
 
@@ -51,16 +52,17 @@ NPP_daily_ave_2049$afforestation <- factor(NPP_daily_ave_2049$afforestation,
                                        levels = c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
                                        labels = c("0.0", "0.2", "0.4", "0.6", "0.8", "1.0"))
 
-p_NPP_average <- ggplot(NPP_daily_ave_2049, aes(x = as.Date(time), y = NPP_forest_plantFATE,
+p_NPP_average <- ggplot(NPP_daily_ave_2049, aes(x = as.Date(time), y = NPP,
                                           linetype = biodiversity,
                                           color = afforestation)) +
   geom_line() +
-  ggtitle(paste0("Average Basin Daily Forest Net Primary Productivity\n(Rolling 14-day Average)",  sep = "")) +
+  ggtitle(paste0("Average Basin Daily Forest \nNet Primary Productivity\n(Rolling 14-day Average)",  sep = "")) +
   scale_color_manual("Afforestation\nLevel", values = palette_colours[1:6]) +
   scale_linetype_discrete("Biodiversity") +
   xlab("Year") + 
   ylab(bquote('Net Primary Productivity [kgC' * d^-1 * m^-1 * ']')) + 
-  theme_bw()
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 p_NPP_average
 
 

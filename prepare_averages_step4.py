@@ -68,7 +68,7 @@ def is_dry(month):
 
 outputs = ["groundwater_recharge_forest_m.zarr"]
 
-outputs_df = outputs_all_df.head(5)
+outputs_df = outputs_all_df.tail(3)
 print(outputs_df)
 sim_df_sub = sim_df
 print(sim_df_sub)

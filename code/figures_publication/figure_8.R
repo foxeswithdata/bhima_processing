@@ -10,13 +10,8 @@ Sys.setlocale("LC_ALL", "en_US.UTF-8")
 figure_dir = "out/figures_publication/"
 
 #### First figure - transpiration sum over basin
-transpiration_sum_yearly = read.csv("out/ssp3_preproc/transpiration_plantfate_basin_sum_daily.csv") %>%
-  drop_na() %>%
-  dplyr::filter(transpiration_plantfate_m != 0) %>% ### Because of set up at first time point transpiration is 0 so we remove it
-  mutate(yr = year(time)) %>%
-  group_by(yr, afforestation, biodiversity) %>%
-  summarise(summed_transpiration = sum(transpiration_plantfate_m))
-
+transpiration_sum_yearly = read.csv("out/ssp3/spatial_preprocessing/transpiration/transpiration_plantfate_basin_sum_yearly.csv") %>%
+  drop_na()
 transpiration_sum_yearly$afforestation[transpiration_sum_yearly$afforestation == 10] <- 1.0
 transpiration_sum_yearly$biodiversity[transpiration_sum_yearly$biodiversity == "high"] <- "High"
 transpiration_sum_yearly$biodiversity[transpiration_sum_yearly$biodiversity == "low"] <- "Low"
@@ -27,7 +22,7 @@ transpiration_sum_yearly$afforestation <- factor(transpiration_sum_yearly$affore
                                      labels = c("0.0", "0.2", "0.4", "0.6", "0.8", "1.0"))
 
 
-p_transpiration_total <- ggplot(transpiration_sum_yearly, aes(x = yr, y = summed_transpiration,
+p_transpiration_total <- ggplot(transpiration_sum_yearly, aes(x = year, y = transpiration_plantfate_m,
                                                   linetype = biodiversity,
                                                   color = afforestation)) +
   geom_line() +
@@ -41,7 +36,7 @@ p_transpiration_total
 
 #### Second figure - transpiration average daily per m2
 
-transpiration_average_yearly = read.csv("out/ssp3_preproc/transpiration_forest_average_yearly.csv")
+transpiration_average_yearly = read.csv("out/ssp3/spatial_preprocessing/transpiration/transpiration_forest_average_yearly.csv")
 
 transpiration_average_yearly$afforestation[transpiration_average_yearly$afforestation == "10.0"] <- "1.0"
 transpiration_average_yearly$afforestation[transpiration_average_yearly$afforestation == "na"] <- "N/A" 
@@ -52,7 +47,7 @@ transpiration_average_yearly$biodiversity[transpiration_average_yearly$biodivers
 transpiration_average_yearly$biodiversity <- factor(transpiration_average_yearly$biodiversity, levels = c("High", "Low", "Default\nGEB"))
 
 
-p_transpiration_ave <- ggplot(transpiration_average_yearly, aes(x = year, y = transpiration_forest_m, 
+p_transpiration_ave <- ggplot(transpiration_average_yearly, aes(x = year, y = transpiration, 
                                                 linetype = biodiversity,
                                                 colour = afforestation)) + 
   geom_line() + 

@@ -12,10 +12,7 @@ dir.create(figure_dir, showWarnings = FALSE, recursive = TRUE)
 
 ## First figure NPP
 ### NPP
-NPP_plantFATE_yearly = read.csv("out/ssp3_preproc/NPP_plantfate_basin_sum_daily.csv") %>%
-  mutate(yr = year(time)) %>%
-  group_by(yr, afforestation, biodiversity) %>%
-  summarise(summed_NPP = sum(NPP_forest_plantFATE))
+NPP_plantFATE_yearly = read.csv("out/ssp3/spatial_preprocessing/NPP/NPP_plantfate_basin_sum_yearly.csv")
 
 NPP_plantFATE_yearly$afforestation[NPP_plantFATE_yearly$afforestation == 10] <- 1.0
 NPP_plantFATE_yearly$biodiversity[NPP_plantFATE_yearly$biodiversity == "high"] <- "High"
@@ -26,7 +23,7 @@ NPP_plantFATE_yearly$afforestation <- factor(NPP_plantFATE_yearly$afforestation,
                                      levels = c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
                                      labels = c("0.0", "0.2", "0.4", "0.6", "0.8", "1.0"))
 
-p_NPP_total <- ggplot(NPP_plantFATE_yearly, aes(x = yr, y = summed_NPP,
+p_NPP_total <- ggplot(NPP_plantFATE_yearly, aes(x = year, y = NPP_forest_plantFATE,
                                         linetype = biodiversity,
                                         color = afforestation)) +
   geom_line() +
@@ -40,11 +37,8 @@ p_NPP_total
 
 
 ### Biomass
-biomass_plantFATE_yearly = read.csv("out/ssp3_preproc/biomass_plantfate_basin_sum_daily.csv") %>%
-  mutate(yr = year(time)) %>%
-  group_by(yr, afforestation, biodiversity) %>%
-  summarise(summed_biomass = sum(biomass_forest_plantFATE))
-
+biomass_plantFATE_yearly = read.csv("out/ssp3/spatial_preprocessing/biomass/biomass_plantfate_basin_sum_yearly.csv")
+  
 biomass_plantFATE_yearly$afforestation[biomass_plantFATE_yearly$afforestation == 10] <- 1.0
 biomass_plantFATE_yearly$biodiversity[biomass_plantFATE_yearly$biodiversity == "high"] <- "High"
 biomass_plantFATE_yearly$biodiversity[biomass_plantFATE_yearly$biodiversity == "low"] <- "Low"
@@ -54,7 +48,7 @@ biomass_plantFATE_yearly$afforestation <- factor(biomass_plantFATE_yearly$affore
                                      levels = c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
                                      labels = c("0.0", "0.2", "0.4", "0.6", "0.8", "1.0"))
 
-p_biomass_total <- ggplot(biomass_plantFATE_yearly, aes(x = yr, y = summed_biomass,
+p_biomass_total <- ggplot(biomass_plantFATE_yearly, aes(x = year, y = biomass_forest_plantFATE,
                                             linetype = biodiversity,
                                             color = afforestation)) +
   geom_line() +
@@ -72,14 +66,20 @@ p <- ggpubr::ggarrange(p_NPP_total, p_biomass_total,
                        legend = "right")
 p  
 
-filename_figure = paste("forest_npp_biodiversity_both")
+filename_figure = paste("figure_9_forest_npp_biodiversity_both")
 filename_figure = paste(filename_figure, "png", sep = ".")
 ggsave(filename_figure, plot = p, device = NULL, path = figure_dir,
        scale = 1, width = 240, height = 138, dpi = 300, limitsize = TRUE,
        units =  "mm")
 
-filename_figure = paste("forest_npp_biodiversity_both")
+filename_figure = paste("figure_9_forest_npp_biodiversity_both")
 filename_figure = paste(filename_figure, "eps", sep = ".")
 ggsave(filename_figure, plot = p, device = NULL, path = figure_dir,
        scale = 1, width = 240, height = 138, dpi = 300, limitsize = TRUE,
        units =  "mm")
+
+
+addedvals = c(0, diff(biomass_plantFATE_yearly$biomass_forest_plantFATE[biomass_plantFATE_yearly$afforestation == "1.0" & biomass_plantFATE_yearly$biodiversity == "High"]))
+biomass_plantFATE_yearly$biomass_forest_plantFATE[biomass_plantFATE_yearly$afforestation == "1.0" & biomass_plantFATE_yearly$biodiversity == "High"]
+
+plot(diff(biomass_plantFATE_yearly$biomass_forest_plantFATE[biomass_plantFATE_yearly$afforestation == "1.0" & biomass_plantFATE_yearly$biodiversity == "High"]), type = "b")

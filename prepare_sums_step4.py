@@ -50,11 +50,6 @@ print(sim_df_sub)
 
 ### PlantFATE totals
 
-grid_area = 817398.837317795
-
-outputs_df = outputs_all_df.iloc[5:8, :]
-print(outputs_df)
-
 outputs_df = outputs_all_df.iloc[5:8, :]
 print(outputs_df)
 
@@ -134,13 +129,22 @@ for index_o, row_o in outputs_df.iterrows():
 
             # ---------------- MONTHLY ----------------
             # sum daily totals within each year-month, across the basin
-            da_zarr_aggregated_sum_monthly = (
-                da_zarr_normalized
-                .sum(dim=["x", "y"], skipna=True)
-                .groupby(["time.year", "time.month"])
-                .sum(dim="time", skipna=True)
-                .to_dataframe()
-            )
+            if row_o['variable_name'] == 'biomass':
+                da_zarr_aggregated_sum_monthly = (
+                    da_zarr_normalized
+                    .sum(dim=["x", "y"], skipna=True)
+                    .groupby(["time.year", "time.month"])
+                    .mean(dim="time", skipna=True)
+                    .to_dataframe()
+                )
+            else :
+                da_zarr_aggregated_sum_monthly = (
+                    da_zarr_normalized
+                    .sum(dim=["x", "y"], skipna=True)
+                    .groupby(["time.year", "time.month"])
+                    .sum(dim="time", skipna=True)
+                    .to_dataframe()
+                )
             da_zarr_aggregated_sum_monthly['afforestation'] = row['afforestation']
             da_zarr_aggregated_sum_monthly['biodiversity'] = row['biodiversity']
             da_zarr_aggregated_sum_monthly = da_zarr_aggregated_sum_monthly.drop('spatial_ref', axis=1)
@@ -148,13 +152,22 @@ for index_o, row_o in outputs_df.iterrows():
             aggregated_sum_monthly.append(da_zarr_aggregated_sum_monthly)
 
             # ---------------- YEARLY ----------------
-            da_zarr_aggregated_sum_yearly = (
-                da_zarr_normalized
-                .sum(dim=["x", "y"], skipna=True)
-                .groupby("time.year")
-                .sum(dim="time", skipna=True)
-                .to_dataframe()
-            )
+            if row_o['variable_name'] == 'biomass':
+                da_zarr_aggregated_sum_yearly = (
+                    da_zarr_normalized
+                    .sum(dim=["x", "y"], skipna=True)
+                    .groupby("time.year")
+                    .mean(dim="time", skipna=True)
+                    .to_dataframe()
+                )
+            else:
+                da_zarr_aggregated_sum_yearly = (
+                    da_zarr_normalized
+                    .sum(dim=["x", "y"], skipna=True)
+                    .groupby("time.year")
+                    .sum(dim="time", skipna=True)
+                    .to_dataframe()
+                )
             da_zarr_aggregated_sum_yearly['afforestation'] = row['afforestation']
             da_zarr_aggregated_sum_yearly['biodiversity'] = row['biodiversity']
             da_zarr_aggregated_sum_yearly = da_zarr_aggregated_sum_yearly.drop('spatial_ref', axis=1)
@@ -167,14 +180,14 @@ for index_o, row_o in outputs_df.iterrows():
     # save csv files
     os.makedirs(os.path.join(out_folder, row_o['variable_name']), exist_ok=True)
 
-    filename = str(out_folder + row_o['variable'] + '/' + row_o['variable'] + "_" + row_o['scale'] + "_basin_sum_daily.csv")
+    filename = str(out_folder + row_o['variable_name'] + '/' + row_o['variable_name'] + "_" + row_o['scale'] + "_basin_sum_daily.csv")
     pd.concat(aggregated_sum_daily).to_csv(filename, index=True)
 
-    filename = str(out_folder + row_o['variable'] + '/' + row_o['variable'] + "_" + row_o['scale'] + "_basin_sum_daily_rolling.csv")
+    filename = str(out_folder + row_o['variable_name'] + '/' + row_o['variable_name'] + "_" + row_o['scale'] + "_basin_sum_daily_rolling.csv")
     pd.concat(aggregated_sum_daily_rolling).to_csv(filename, index=True)
 
-    filename = str(out_folder + row_o['variable'] + '/' + row_o['variable'] + "_" + row_o['scale'] + "_basin_sum_monthly.csv")
+    filename = str(out_folder + row_o['variable_name'] + '/' + row_o['variable_name'] + "_" + row_o['scale'] + "_basin_sum_monthly.csv")
     pd.concat(aggregated_sum_monthly).to_csv(filename, index=True)
 
-    filename = str(out_folder + row_o['variable'] + '/' + row_o['variable'] + "_" + row_o['scale'] + "_basin_sum_yearly.csv")
+    filename = str(out_folder + row_o['variable_name'] + '/' + row_o['variable_name'] + "_" + row_o['scale'] + "_basin_sum_yearly.csv")
     pd.concat(aggregated_sum_yearly).to_csv(filename, index=True)
