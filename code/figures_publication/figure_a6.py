@@ -20,6 +20,8 @@ import cartopy.feature as cfeature
 import numpy as np
 import matplotlib.ticker as mticker
 import calendar
+import cmcrameri.cm as cmc
+
 
 os.chdir("../..")
 figure_directory_run = "out/figures_publication/"
@@ -60,6 +62,7 @@ fig_facet = da_monthly_data.plot(
     transform=ccrs.PlateCarree(),
     add_colorbar=False,
     zorder=10000,
+    cmap=cmc.batlow_r,  # <-- Batlow, colorblind-friendly
 )
 
 month_names = [calendar.month_name[int(m)] for m in da_monthly_data["month"].values]

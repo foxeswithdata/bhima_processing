@@ -8,7 +8,7 @@ import geopandas as gpd
 
 ### STEP 3 data
 
-ghod_region = gpd.read_file("data/maps/region.gpkg")
+ghod_region = gpd.read_file("../data/maps/region.gpkg")
 
 data_folder = "data/ssp3_out/"
 simulations = ["GEB_step3_default_spinup", "GEB_step3_plantfate_hb_spinup", "GEB_step3_plantfate_lb_spinup"]

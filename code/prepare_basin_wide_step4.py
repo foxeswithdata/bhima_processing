@@ -6,7 +6,7 @@ import geopandas as gpd
 
 ### STEP 4 data
 
-ghod_region = gpd.read_file("data/maps/region.gpkg")
+ghod_region = gpd.read_file("../data/maps/region.gpkg")
 out_folder = "out/ssp3_preproc/not_averaged/"
 
 data_folder = "data/ssp3_out/"

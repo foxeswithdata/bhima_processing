@@ -20,6 +20,7 @@ import cartopy.feature as cfeature
 import numpy as np
 import matplotlib.ticker as mticker
 import calendar
+import cmcrameri.cm as cmc
 
 
 os.chdir("../..")
@@ -118,6 +119,7 @@ for row, month in enumerate(target_months):
             vmin=vmin,
             vmax=vmax,
             zorder=10000,
+            cmap=cmc.batlow_r,  # <-- Batlow, colorblind-friendly
         )
 
         ax.set_extent(

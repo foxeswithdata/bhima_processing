@@ -1,7 +1,7 @@
 # looking at plantfate outputs from plantfate spinup alone (step 2)
 # 14/04/2025  
 # update 22/04/2025 with full model run
-
+rm(list = ls())
 library(tidyverse)
 library(ggpubr) #ggarrange
 library(fmsb) #radar chart
@@ -67,6 +67,7 @@ sp_seeds <- ggplot(species_properties)+
 species_properties_plot <- ggarrange(sp_dens, sp_ph, sp_ca, sp_ba, sp_tb, sp_seeds,
           ncol = 2, nrow = 3,
           common.legend = TRUE)
+species_properties_plot
 # # legend = "none"
 # ggsave("data/spinup/spinup_PF/plots/species_properties_plot.png",species_properties_plot,
 #        width = 9.23, height = 8.06)

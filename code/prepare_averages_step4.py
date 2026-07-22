@@ -7,7 +7,7 @@ import geopandas as gpd
 ### STEP 4 data
 
 # --- region of interest, used to clip every zarr dataset to the study area ---
-ghod_region = gpd.read_file("data/maps/region.gpkg")
+ghod_region = gpd.read_file("../data/maps/region.gpkg")
 out_folder = "out/ssp3/spatial_preprocessing/"
 
 data_folder = "data/ssp3_out/"
@@ -118,7 +118,7 @@ for index_o, row_o in outputs_df.iterrows():
             # the "na" (no-afforestation) baseline simulation doesn't have its own
             # area file, so fall back to the af_00 forest area as a stand-in
             if row['afforestation'] == 'na':
-                filename_area = "data/GEB_step4_test_new_forest_area_af_00_lb/hydrology.soil/forest_area_m2.zarr"
+                filename_area = "../data/GEB_step4_test_new_forest_area_af_00_lb/hydrology.soil/forest_area_m2.zarr"
 
 
             da_zarr_area = xr.open_zarr(filename_area, consolidated=False)

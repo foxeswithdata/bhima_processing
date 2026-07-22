@@ -2,18 +2,25 @@ rm(list = ls())
 
 library(tidyverse)
 library(ggpubr)
-
-forest_cells <- read.csv("test_plantFATE_out/data/simulation_list.csv")
-forest_cells <- unique(select(forest_cells, c("new_forest", "cell")))
+Sys.setlocale("LC_ALL", "en_US.UTF-8")
+forest_cells <- read.csv("data/plantFATE_rerun_data/simulation_list.csv")
+forest_cells <- unique(forest_cells[forest_cells["biodiversity"] == "lb", c("cell", "biodiversity")])
 
 for (i in 1:nrow(forest_cells)){
+  print(i)
 
-  figure_dir = paste("test_plantFATE_out/output/test_individual_cells/cell_", forest_cells$cell[i], "/", sep = "")
+  results_directory_hb = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_hb_af_10/cell_", 
+                     forest_cells$cell[i],
+                     "_hb/", 
+                     sep = "")
+  results_directory_lb = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_lb_af_10/cell_", 
+                               forest_cells$cell[i],
+                               "_lb/", 
+                               sep = "")
+  figure_dir = paste("out/PlantFATE_reruns_out/test_individual_cells/figures/cell_", forest_cells$cell[i], "/", sep = "")
   dir.create(figure_dir, showWarnings = FALSE, recursive = TRUE)
   
-  results_directory = ifelse(forest_cells$new_forest[i], "output/cell", "simulation_root/default/plantFATE/cell")
-  results_directory_hb = paste(results_directory, forest_cells$cell[i], "hb", sep = "_")
-  results_directory_lb = paste(results_directory, forest_cells$cell[i], "lb", sep = "_")
+  ## Load data
   
   community_level_out_hb <- read.csv(paste(results_directory_hb, "/D_PFATE.csv", sep = ""))
   community_level_out_hb$date <- as.Date(paste(community_level_out_hb$IYEAR, community_level_out_hb$MON, community_level_out_hb$DAY, sep = "-"))
@@ -23,7 +30,6 @@ for (i in 1:nrow(forest_cells)){
   community_level_out_lb$biodiversity <- "Low"
   community_level_out <- rbind(community_level_out_lb, community_level_out_hb)
   community_level_out$biodiversity <- factor(community_level_out$biodiversity, levels = c("High", "Low"))
-  
   
   species_data_mean_out_hb =  read.csv(paste(results_directory_hb, "/Y_mean_PFATE.csv", sep = ""))
   species_data_mean_out_hb$biodiversity <- "High"
@@ -44,11 +50,13 @@ for (i in 1:nrow(forest_cells)){
     return(spn)
   })
   
-  environment_data <- read.csv(paste("test_plantFATE_out/data/GEB_step4_lb_af_10/", "/env_data_cell_2838.csv", sep = ""))
-  environment_data$Date <- as.Date(environment_data$Date)
-  
-  head(community_level_out)
-  head(environment_data)
+  environment_data_hb <- read.csv(paste("data/plantFATE_rerun_data/GEB_step4_hb_af_10/env_data_cell_", forest_cells$cell[i], ".csv", sep = ""))
+  environment_data_hb$Date <- as.Date(environment_data_hb$Date)
+  environment_data_hb$biodiversity = "High"
+  environment_data_lb <- read.csv(paste("data/plantFATE_rerun_data/GEB_step4_lb_af_10/env_data_cell_", forest_cells$cell[i], ".csv", sep = ""))
+  environment_data_lb$Date <- as.Date(environment_data_lb$Date)
+  environment_data_lb$biodiversity = "Low"
+  environment_data <- rbind(environment_data_hb, environment_data_lb)
 
   p <- ggplot(species_data_mean_out, aes(x = YEAR, y=LAI, color = biodiversity))+
     geom_line() +
@@ -149,22 +157,22 @@ for (i in 1:nrow(forest_cells)){
   environment_data_sub <- environment_data %>%
     filter(Date > as.Date("2044-12-31"))
   
-  p_PAR <- ggplot(environment_data_sub, aes(x = Date, y=PAR))+
+  p_PAR <- ggplot(environment_data_sub, aes(x = Date, y=PAR, color = biodiversity))+
     geom_line() +
     xlab("Date") +
     ylab("PAR [umolm-2s-1]") + 
     theme_bw()
-  p_Temp <- ggplot(environment_data_sub, aes(x = Date, y=Temp))+
+  p_Temp <- ggplot(environment_data_sub, aes(x = Date, y=Temp, color = biodiversity))+
     geom_line()+
     xlab("Date") +
     ylab("Temperature [C]") + 
     theme_bw()
-  p_VPD <- ggplot(environment_data_sub, aes(x = Date, y=VPD))+
+  p_VPD <- ggplot(environment_data_sub, aes(x = Date, y=VPD, color = biodiversity))+
     geom_line()+
     xlab("Date") +
     ylab("Vapour Pressure Deficit [hPa]") + 
     theme_bw()
-  p_SWP <- ggplot(environment_data_sub, aes(x = Date, y=-SWP))+
+  p_SWP <- ggplot(environment_data_sub, aes(x = Date, y=-SWP, color = biodiversity))+
     geom_line()+
     xlab("Date") +
     ylab("Soil Water Potential [-MPa]") + 
@@ -193,22 +201,22 @@ for (i in 1:nrow(forest_cells)){
   environment_data_sub <- environment_data %>%
     filter(Date > as.Date("2045-12-31") & Date <= as.Date("2046-12-31"))
   
-  p_PAR <- ggplot(environment_data_sub, aes(x = Date, y=PAR))+
+  p_PAR <- ggplot(environment_data_sub, aes(x = Date, y=PAR, color = biodiversity))+
     geom_line() +
     xlab("Date") +
     ylab("PAR [umolm-2s-1]") + 
     theme_bw()
-  p_Temp <- ggplot(environment_data_sub, aes(x = Date, y=Temp))+
+  p_Temp <- ggplot(environment_data_sub, aes(x = Date, y=Temp, color = biodiversity))+
     geom_line()+
     xlab("Date") +
     ylab("Temperature [C]") + 
     theme_bw()
-  p_VPD <- ggplot(environment_data_sub, aes(x = Date, y=VPD))+
+  p_VPD <- ggplot(environment_data_sub, aes(x = Date, y=VPD, color = biodiversity))+
     geom_line()+
     xlab("Date") +
     ylab("Vapour Pressure Deficit [hPa]") + 
     theme_bw()
-  p_SWP <- ggplot(environment_data_sub, aes(x = Date, y=-SWP))+
+  p_SWP <- ggplot(environment_data_sub, aes(x = Date, y=-SWP, color = biodiversity))+
     geom_line()+
     xlab("Date") +
     ylab("Soil Water Potential [-MPa]") + 
@@ -258,15 +266,21 @@ for (i in 1:nrow(forest_cells)){
          units =  "mm")
     
 }
+# 
+# i = 1
+# figure_dir = paste("test_plantFATE_out/output/test_individual_cells/", forest_cells$cell[i], "/", sep = "")
+# dir.create(figure_dir, showWarnings = FALSE, recursive = TRUE)
 
-i = 1
-figure_dir = paste("test_plantFATE_out/output/test_individual_cells/", forest_cells$cell[i], "/", sep = "")
-dir.create(figure_dir, showWarnings = FALSE, recursive = TRUE)
 
 community_level_out_all <- lapply(1:nrow(forest_cells), function(i){
-  results_directory = ifelse(forest_cells$new_forest[i], "output/cell", "simulation_root/default/plantFATE/cell")
-  results_directory_hb = paste(results_directory, forest_cells$cell[i], "hb", sep = "_")
-  results_directory_lb = paste(results_directory, forest_cells$cell[i], "lb", sep = "_")
+  results_directory_hb = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_hb_af_10/cell_", 
+                               forest_cells$cell[i],
+                               "_hb/", 
+                               sep = "")
+  results_directory_lb = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_lb_af_10/cell_", 
+                               forest_cells$cell[i],
+                               "_lb/", 
+                               sep = "")
   community_level_out_hb <- read.csv(paste(results_directory_hb, "/D_PFATE.csv", sep = ""))
   community_level_out_hb$date <- as.Date(paste(community_level_out_hb$IYEAR, community_level_out_hb$MON, community_level_out_hb$DAY, sep = "-"))
   community_level_out_hb$biodiversity <- "High"
@@ -282,9 +296,14 @@ community_level_out_all <- lapply(1:nrow(forest_cells), function(i){
 community_level_out_all <- plyr::rbind.fill(community_level_out_all)
 
 species_data_mean_out_all <- lapply(1:nrow(forest_cells), function(i){
-  results_directory = ifelse(forest_cells$new_forest[i], "output/cell", "simulation_root/default/plantFATE/cell")
-  results_directory_hb = paste(results_directory, forest_cells$cell[i], "hb", sep = "_")
-  results_directory_lb = paste(results_directory, forest_cells$cell[i], "lb", sep = "_")
+  results_directory_hb = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_hb_af_10/cell_", 
+                               forest_cells$cell[i],
+                               "_hb/", 
+                               sep = "")
+  results_directory_lb = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_lb_af_10/cell_", 
+                               forest_cells$cell[i],
+                               "_lb/", 
+                               sep = "")
   species_data_mean_out_hb =  read.csv(paste(results_directory_hb, "/Y_mean_PFATE.csv", sep = ""))
   species_data_mean_out_hb$biodiversity <- "High"
   species_data_mean_out_lb =  read.csv(paste(results_directory_lb, "/Y_mean_PFATE.csv", sep = ""))
@@ -298,9 +317,14 @@ species_data_mean_out_all <- lapply(1:nrow(forest_cells), function(i){
 species_data_mean_out_all <- plyr::rbind.fill(species_data_mean_out_all)
 
 species_data_out_all <- lapply(1:nrow(forest_cells), function(i){
-  results_directory = ifelse(forest_cells$new_forest[i], "output/cell", "simulation_root/default/plantFATE/cell")
-  results_directory_hb = paste(results_directory, forest_cells$cell[i], "hb", sep = "_")
-  results_directory_lb = paste(results_directory, forest_cells$cell[i], "lb", sep = "_")
+  results_directory_hb = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_hb_af_10/cell_", 
+                               forest_cells$cell[i],
+                               "_hb/", 
+                               sep = "")
+  results_directory_lb = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_lb_af_10/cell_", 
+                               forest_cells$cell[i],
+                               "_lb/", 
+                               sep = "")
   species_data_out_hb = read.csv(paste(results_directory_hb, "/Y_PFATE.csv", sep = ""))
   species_data_out_hb$biodiversity <- "High"
   species_data_out_lb =  read.csv(paste(results_directory_lb, "/Y_PFATE.csv", sep = ""))

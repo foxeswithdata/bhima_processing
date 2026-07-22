@@ -19,6 +19,8 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import numpy as np
 import matplotlib.ticker as mticker
+import cmcrameri.cm as cmc
+
 
 
 
@@ -79,6 +81,7 @@ mappable = da_yearly_data.plot(
     transform=ccrs.PlateCarree(),
     add_colorbar=False,
     zorder=10000,
+    cmap=cmc.batlow_r,  # <-- Batlow, colorblind-friendly
 )
 
 ax.set_extent([x_min - x_pad, x_max + x_pad, y_min - y_pad, y_max + y_pad], crs=ccrs.PlateCarree())
@@ -128,6 +131,7 @@ fig.colorbar(
     orientation="horizontal",
     label="Normalized Soil Moisture (m/m)",
     ticks=ticks,
+
 )
 
 fig.savefig(figure_filename, dpi=300, bbox_inches="tight")
