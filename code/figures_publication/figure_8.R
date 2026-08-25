@@ -28,7 +28,7 @@ p_transpiration_total <- ggplot(transpiration_sum_yearly, aes(x = year, y = tran
   geom_line() +
   ggtitle("Total Forest Yearly Transpiration") +
   scale_color_manual("Afforestation\nLevel", values = palette_colours[1:6], guide = "none") +
-  scale_linetype_discrete("Biodiversity", guide = "none") +
+  scale_linetype_discrete("Model Type", guide = "none") +
   xlab("Year") +
   ylab(bquote('Transpiration [kg'~H[2]~'O'~y^-'1'~']')) +
   theme_bw()
@@ -40,11 +40,11 @@ transpiration_average_yearly = read.csv("out/ssp3/spatial_preprocessing/transpir
 
 transpiration_average_yearly$afforestation[transpiration_average_yearly$afforestation == "10.0"] <- "1.0"
 transpiration_average_yearly$afforestation[transpiration_average_yearly$afforestation == "na"] <- "N/A" 
-transpiration_average_yearly$biodiversity[transpiration_average_yearly$biodiversity == "high"] <- "High"
-transpiration_average_yearly$biodiversity[transpiration_average_yearly$biodiversity == "low"] <- "Low"
+transpiration_average_yearly$biodiversity[transpiration_average_yearly$biodiversity == "high"] <- "GEB-PF High"
+transpiration_average_yearly$biodiversity[transpiration_average_yearly$biodiversity == "low"] <- "GEB-PF Low"
 transpiration_average_yearly$biodiversity[transpiration_average_yearly$biodiversity == "na"] <- "Default\nGEB"
 
-transpiration_average_yearly$biodiversity <- factor(transpiration_average_yearly$biodiversity, levels = c("High", "Low", "Default\nGEB"))
+transpiration_average_yearly$biodiversity <- factor(transpiration_average_yearly$biodiversity, levels = c("GEB-PF High", "GEB-PF Low", "Default\nGEB"))
 
 
 p_transpiration_ave <- ggplot(transpiration_average_yearly, aes(x = year, y = transpiration, 
@@ -53,7 +53,7 @@ p_transpiration_ave <- ggplot(transpiration_average_yearly, aes(x = year, y = tr
   geom_line() + 
   ggtitle("Average Annual Forest Transpiration\n(Daily Average)") + 
   scale_color_manual("Afforestation\nLevel", values = palette_colours) +
-  scale_linetype_discrete("Biodiversity") +
+  scale_linetype_discrete("Model Type") +
   xlab("Year") + 
   ylab(expression('Transpiration [kg'~H[2]~'O'~d^-1~m^-2~']')) +
   theme_bw()

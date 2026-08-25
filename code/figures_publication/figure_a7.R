@@ -26,19 +26,29 @@ dfs <- lapply(1:nrow(dirs_df), function(m){
   return(out)
 })
 
-param_yearly <-bind_rows(dfs) %>%
+transpiration_average_yearly_basin <-bind_rows(dfs) %>%
   mutate(yr = year(date)) %>%
   group_by(yr, afforestation, biodiversity) %>%
   summarise(avg = mean(soil_moisture_weighted_mean_m))
 
-p <- ggplot(param_yearly, aes(x = yr, y = avg,
+
+transpiration_average_yearly_basin$afforestation[transpiration_average_yearly_basin$afforestation == "10.0"] <- "1.0"
+transpiration_average_yearly_basin$afforestation[transpiration_average_yearly_basin$afforestation == "na"] <- "N/A" 
+transpiration_average_yearly_basin$biodiversity[transpiration_average_yearly_basin$biodiversity == "high"] <- "GEB-PF High"
+transpiration_average_yearly_basin$biodiversity[transpiration_average_yearly_basin$biodiversity == "low"] <- "GEB-PF Low"
+transpiration_average_yearly_basin$biodiversity[transpiration_average_yearly_basin$biodiversity == "na"] <- "Default\nGEB"
+
+transpiration_average_yearly_basin$biodiversity <- factor(transpiration_average_yearly_basin$biodiversity, levels = c("GEB-PF High", "GEB-PF Low", "Default\nGEB"))
+
+
+p <- ggplot(transpiration_average_yearly_basin, aes(x = yr, y = avg,
                               linetype = biodiversity,
                               color = as.factor(afforestation))) +
   geom_line() +
   ggtitle(paste0("Average Basin Yearly Soil Moisture [m]",  sep = "")) +
   xlab("Year") +
   scale_color_manual("Afforestation\nLevel", values = palette_colours) +
-  scale_linetype_discrete("Biodiversity") +
+  scale_linetype_discrete("Model Type") +
   ylab('Soil Moisture [m]') + 
   theme_bw() 
 p

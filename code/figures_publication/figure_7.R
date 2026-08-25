@@ -15,10 +15,10 @@ soil_moisture_average_yearly = read.csv("out/ssp3/spatial_preprocessing/soil_moi
 ## Rename values for printing
 soil_moisture_average_yearly$afforestation[soil_moisture_average_yearly$afforestation == "10.0"] <- "1.0"
 soil_moisture_average_yearly$afforestation[soil_moisture_average_yearly$afforestation == "na"] <- "N/A" 
-soil_moisture_average_yearly$biodiversity[soil_moisture_average_yearly$biodiversity == "high"] <- "High"
-soil_moisture_average_yearly$biodiversity[soil_moisture_average_yearly$biodiversity == "low"] <- "Low"
+soil_moisture_average_yearly$biodiversity[soil_moisture_average_yearly$biodiversity == "high"] <- "GEB-PF High"
+soil_moisture_average_yearly$biodiversity[soil_moisture_average_yearly$biodiversity == "low"] <- "GEB-PF Low"
 soil_moisture_average_yearly$biodiversity[soil_moisture_average_yearly$biodiversity == "na"] <- "Default\nGEB"
-soil_moisture_average_yearly$biodiversity <- factor(soil_moisture_average_yearly$biodiversity, levels = c("High", "Low", "Default\nGEB"))
+soil_moisture_average_yearly$biodiversity <- factor(soil_moisture_average_yearly$biodiversity, levels = c("GEB-PF High", "GEB-PF Low", "Default\nGEB"))
 
 ## Plot
 p_annual <- ggplot(soil_moisture_average_yearly, aes(x = year, y = soil_moisture, 
@@ -27,7 +27,7 @@ p_annual <- ggplot(soil_moisture_average_yearly, aes(x = year, y = soil_moisture
   geom_line() + 
   ggtitle("Average Annual Forest \nNormalised Soil Moisture") + 
   scale_color_manual("Afforestation\nLevel", values = palette_colours) +
-  scale_linetype_discrete("Biodiversity") +
+  scale_linetype_discrete("Model Type") +
   xlab("Year") + 
   ylab(bquote('Normalized Soil Moisture [m'~m^-1~']')) + 
   theme_bw()
@@ -43,10 +43,10 @@ soil_moisture_daily_average_2049 = read.csv("out/ssp3/spatial_preprocessing/soil
 
 soil_moisture_daily_average_2049$afforestation[soil_moisture_daily_average_2049$afforestation == "10.0"] <- "1.0"
 soil_moisture_daily_average_2049$afforestation[soil_moisture_daily_average_2049$afforestation == "na"] <- "N/A" 
-soil_moisture_daily_average_2049$biodiversity[soil_moisture_daily_average_2049$biodiversity == "high"] <- "High"
-soil_moisture_daily_average_2049$biodiversity[soil_moisture_daily_average_2049$biodiversity == "low"] <- "Low"
+soil_moisture_daily_average_2049$biodiversity[soil_moisture_daily_average_2049$biodiversity == "high"] <- "GEB-PF High"
+soil_moisture_daily_average_2049$biodiversity[soil_moisture_daily_average_2049$biodiversity == "low"] <- "GEB-PF Low"
 soil_moisture_daily_average_2049$biodiversity[soil_moisture_daily_average_2049$biodiversity == "na"] <- "Default\nGEB"
-soil_moisture_daily_average_2049$biodiversity <- factor(soil_moisture_daily_average_2049$biodiversity, levels = c("High", "Low", "Default\nGEB"))
+soil_moisture_daily_average_2049$biodiversity <- factor(soil_moisture_daily_average_2049$biodiversity, levels = c("GEB-PF High", "GEB-PF Low", "Default\nGEB"))
 soil_moisture_daily_average_2049$afforestation <- as.factor(soil_moisture_daily_average_2049$afforestation)
 
 
@@ -56,7 +56,7 @@ p_2049 <- ggplot(soil_moisture_daily_average_2049, aes(x = as.Date(time), y = so
   geom_line() + 
   ggtitle("Daily Average Forest Normalised Soil Moisture\n(Rolling 14 day Average) ") + 
   scale_color_manual("Afforestation\nLevel", values = palette_colours) +
-  scale_linetype_discrete("Biodiversity") +
+  scale_linetype_discrete("Model Type") +
   xlab("Time") +
   ylab(bquote('Normalized Soil Moisture [m'~m^-1~']')) + 
   theme_bw() + 

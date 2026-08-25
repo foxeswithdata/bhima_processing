@@ -34,7 +34,9 @@ p_NPP_total <- ggplot(NPP_daily_total_2049, aes(x = as.Date(time), y = NPP_fores
   xlab("Year") + 
   ylab(bquote('Net Primary Productivity [kgC'~d^-1~']')) + 
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.title=element_text(size=8),
+        legend.text = element_text(size=8))
 p_NPP_total
 
 ### NPP average forest NPP 
@@ -62,7 +64,9 @@ p_NPP_average <- ggplot(NPP_daily_ave_2049, aes(x = as.Date(time), y = NPP,
   xlab("Year") + 
   ylab(bquote('Net Primary Productivity [kgC' * d^-1 * m^-1 * ']')) + 
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.title=element_text(size=8),
+        legend.text = element_text(size=8))
 p_NPP_average
 
 
