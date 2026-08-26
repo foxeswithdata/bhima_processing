@@ -5,9 +5,6 @@ import pandas as pd
 import datetime as dt
 from pathlib import Path
 import itertools
-
-os.chdir("..")
-
 # prepare data for step 2 Plantfate
 
 # ---- CONFIGURATION ----------------------------------------------------
@@ -29,26 +26,11 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # make directory output_folder
 
-da_temp = xr.open_zarr(
-            str(INPUT_DIR + "temperature_K.zarr"),
-            consolidated=False
-        )
-da_vpd = xr.open_zarr(
-        str(INPUT_DIR + "vapour_pressure_deficit_kPa.zarr"),
-            consolidated = False
-        )
-da_ppfd = xr.open_zarr(
-            str(INPUT_DIR + "photosynthetic_photon_flux_density_W_m2.zarr"),
-            consolidated = False
-        )
-da_swp = xr.open_zarr(
-            str(INPUT_DIR + "soil_water_potential_MPa.zarr"),
-            consolidated=False
-        )
-da_nr = xr.open_zarr(
-            str(INPUT_DIR + "net_absorbed_radiation_vegetation_MJ_m2_day.zarr"),
-            consolidated=False
-        )
+da_temp = xr.open_zarr(INPUT_DIR / "temperature_K.zarr", consolidated=False)
+da_vpd  = xr.open_zarr(INPUT_DIR / "vapour_pressure_deficit_kPa.zarr", consolidated=False)
+da_ppfd = xr.open_zarr(INPUT_DIR / "photosynthetic_photon_flux_density_W_m2.zarr", consolidated=False)
+da_swp  = xr.open_zarr(INPUT_DIR / "soil_water_potential_MPa.zarr", consolidated=False)
+da_nr   = xr.open_zarr(INPUT_DIR / "net_absorbed_radiation_vegetation_MJ_m2_day.zarr", consolidated=False)
 
 
 if RUN == "step1_spinup":
