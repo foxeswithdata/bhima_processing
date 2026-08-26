@@ -30,18 +30,11 @@ library(fmsb) #radar chart
 #
 # Expected columns: species name, plant type, density, cover.
 # ---------------------------------------------------------------------------
-
-#note: needed to remove the non-breaking spaces 
-# cd PATH_TO_PROJECT_ROOT
-# sed 's/\xa0/ /g' Y_PFATE.csv > Y_PFATE_repl.csv
-
+# Note: non-breaking spaces were removed from the raw PlantFATE output:
+#   sed 's/\xa0/ /g' Y_PFATE.csv > Y_PFATE_repl.csv
 community_properties_full <- read.csv("data/spinup/spinup_PF/Y_mean_PFATE.csv")
 species_properties_full <- read.csv("data/spinup/spinup_PF/Y_PFATE_repl.csv") 
 fluxes_full <- read.csv("data/spinup/spinup_PF/D_PFATE.csv") 
-
-
-
-density_cover_sub <- read.csv("data/spinup/spinup_PF/species_thesis.csv")
 
 folder_out <- "out/step2_plantfate_figures/"
 

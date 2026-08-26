@@ -10,11 +10,6 @@ library(scico)
 # palette_colours[7] = "#222222"
 Sys.setlocale("LC_ALL", "en_US.UTF-8")
 
-# Tableau "Color Blind 10" palette — colorblind-safe, 10 categorical values
-palette_colours <- c(
-  "#006BA4", "#FF800E", "#ABABAB", "#595959", "#5F9ED1",
-  "#C85200", "#898989", "#A2C8EC", "#FFBC79", "#CFCFCF"
-)
 # Seaborn "colorblind" palette — colorblind-safe, 10 categorical values
 palette_colours <- c(
   "#0173B2", "#DE8F05", "#029E73", "#D55E00", "#CC78BC",
@@ -26,15 +21,12 @@ species <- c("Dimorphocalyx lawianus", "Memecylon umbellatum", "Mangifera indica
              "Lepisanthes tetraphylla", "Garcinia talbotii",
              "Syzygium gardneri", "Aglaia lawii")
 
-palette_colours <- setNames(cb10, species)
+palette_colours <- setNames(palette_colours, species)
 
 
 figure_dir = "out/figures_publication//"
 dir.create(figure_dir, showWarnings = FALSE, recursive = TRUE)
 
-#note: needed to remove the non-breaking spaces 
-# cd PATH_TO_PROJECT_ROOT
-# sed 's/\xa0/ /g' Y_PFATE.csv > Y_PFATE_repl.csv
 community_properties_full <- read.csv("data/spinup/spinup_PF/Y_mean_PFATE.csv")
 species_properties_full <- read.csv("data/spinup/spinup_PF/Y_PFATE_repl.csv") 
 fluxes_full <- read.csv("data/spinup/spinup_PF/D_PFATE.csv") 
