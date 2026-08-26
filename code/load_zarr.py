@@ -22,7 +22,7 @@ print(cwd)
 ################################################### SOIL MOISTURE ###################################################
 
 # Path to your .zarr directory
-zarr_folder_path = 'PATH_TO_ZARR_OUTPUT'
+zarr_folder_path = 'data/ssp3_out/GEB_step3_plantfate_hb_spinup/hydrology.soil/soil_moisture_forest_m.zarr'
 
 # Ensure the path exists
 if not os.path.exists(zarr_folder_path):
@@ -109,7 +109,7 @@ print("Saved: soil_moisture_stats_by_time.csv")
 
 ################################################### TRANSPIRATION ###################################################
 # Path to your .zarr directory
-zarr_folder_path = 'PATH_TO_ZARR_OUTPUT'
+zarr_folder_path = 'data/ssp3_out/GEB_step3_plantfate_hb_spinup/hydrology.soil/transpiration_forest_m.zarr/
 
 # Ensure the path exists
 if not os.path.exists(zarr_folder_path):
