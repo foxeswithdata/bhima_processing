@@ -38,7 +38,6 @@ dir.create(figure_dir, showWarnings = FALSE, recursive = TRUE)
 community_properties_full <- read.csv("data/spinup/spinup_PF/Y_mean_PFATE.csv")
 species_properties_full <- read.csv("data/spinup/spinup_PF/Y_PFATE_repl.csv") 
 fluxes_full <- read.csv("data/spinup/spinup_PF/D_PFATE.csv") 
-thesis_species0 <- read.csv("data/spinup/spinup_PF/species_thesis.csv")
 
 #### subsetting for the first 500 years ####
 
@@ -112,9 +111,4 @@ filename_figure = paste(filename_figure, "eps", sep = ".")
 ggsave(filename_figure, plot = species_properties_plot, device = NULL, path = figure_dir,
        scale = 1, width = 240, height = 138, dpi = 300, limitsize = TRUE,
        units =  "mm")
-# # legend = "none"
-# ggsave("data/spinup/spinup_PF/plots/species_properties_plot.png",species_properties_plot,
-#        width = 9.23, height = 8.06)
 
-# ggsave("data/spinup/spinup_PF/plots/species_properties_plot_5000.png",species_properties_plot,
-#        width = 9.23, height = 8.06)
