@@ -6,8 +6,6 @@ import os
 import geopandas as gpd
 import rioxarray
 
-os.chdir("..")
-
 
 ghod_region = gpd.read_file("data/maps/region.gpkg")
 

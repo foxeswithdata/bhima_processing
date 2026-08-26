@@ -5,8 +5,6 @@ import pandas as pd
 import datetime as dt
 import itertools
 
-os.chdir("..")
-
 afforestation = "00"
 biodiversity = "hb"
 

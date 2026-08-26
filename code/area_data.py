@@ -4,8 +4,6 @@ import xarray as xr
 import os
 import geopandas as gpd
 
-os.chdir("..")
-
 ghod_region = gpd.read_file("data/maps/region.gpkg")
 
 data_folder = "data/ssp3_out/"

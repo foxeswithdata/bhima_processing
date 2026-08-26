@@ -24,7 +24,6 @@ import cmcrameri.cm as cmc
 
 
 
-os.chdir("../..")
 figure_directory_run = "out/figures_publication/"
 
 ## Output figure folder

@@ -7,8 +7,6 @@ import os
 import zarr
 import geopandas as gpd
 
-os.chdir("..")
-
 spinup_run = False
 
 ## Output figure folder

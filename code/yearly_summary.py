@@ -7,40 +7,17 @@ import itertools
 simulations = "BAU"
 simulations = "desireable_futures"
 
-data_folder = "data/final_data/"
+INPUT_DIR = "data/final_data/"
 
-da_temp = xr.open_zarr(
-            str(data_folder + simulations + "/temperature_K.zarr.zip"),
-            consolidated=False
-        )
-da_vpd = xr.open_zarr(
-            str(data_folder + simulations + "/vapour_pressure_deficit_kPa.zarr.zip"),
-            consolidated = False
-        )
-da_ppfd = xr.open_zarr(
-            str(data_folder + simulations + "/photosynthetic_photon_flux_density_W_m2.zarr.zip"),
-            consolidated = False
-        )
-da_swp = xr.open_zarr(
-            str(data_folder + simulations + "/soil_water_potential_MPa.zarr.zip"),
-            consolidated=False
-        )
-da_nr = xr.open_zarr(
-            str(data_folder + simulations + '/net_absorbed_radiation_vegetation_MJ_m2_day.zarr.zip'),
-            consolidated=False
-        )
-da_biomass = xr.open_zarr(
-            str(data_folder + simulations + '/biomass_pf.zarr.zip'),
-            consolidated=False
-        )
-da_npp = xr.open_zarr(
-            str(data_folder + simulations + '/npp_pf.zarr.zip'),
-            consolidated=False
-        )
-da_num_ind = xr.open_zarr(
-            str(data_folder + simulations + '/number_of_individuals_pf.zarr.zip'),
-            consolidated=False
-        )
+
+da_temp     = xr.open_zarr(INPUT_DIR / "temperature_K.zarr", consolidated=False)
+da_vpd      = xr.open_zarr(INPUT_DIR / "vapour_pressure_deficit_kPa.zarr", consolidated=False)
+da_ppfd     = xr.open_zarr(INPUT_DIR / "photosynthetic_photon_flux_density_W_m2.zarr", consolidated=False)
+da_swp      = xr.open_zarr(INPUT_DIR / "soil_water_potential_MPa.zarr", consolidated=False)
+da_nr       = xr.open_zarr(INPUT_DIR / "net_absorbed_radiation_vegetation_MJ_m2_day.zarr", consolidated=False)
+da_biomass  = xr.open_zarr(INPUT_DIR / simulations / 'biomass_pf.zarr.zip', consolidated=False)
+da_npp      = xr.open_zarr(INPUT_DIR / simulations / 'npp_pf.zarr.zip', consolidated=False)
+da_num_ind  = xr.open_zarr(INPUT_DIR / simulations / 'number_of_individuals_pf.zarr.zip',consolidated=False)
 
 print("grouping by")
 print(da_biomass)
