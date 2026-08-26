@@ -31,3 +31,8 @@ Rplot*.png
 /test_plantFATE_out/*
 !/test_plantFATE_out/*.py
 !/test_plantFATE_out/*.ini
+
+# removing data from thesis
+data/asmi_2016_thesis_data/
+data/**/species_thesis.csv
+data/**/*_density_cover.csv
