@@ -6,13 +6,48 @@ library(tidyverse)
 library(ggpubr) #ggarrange
 library(fmsb) #radar chart
 
+
+# ---------------------------------------------------------------------------
+# DATA FOR cover and density NOT INCLUDED IN THIS REPOSITORY.
+#
+# This script reads relative density and relative dominance tables from:
+#
+#   Asmi, J. M. (2016). Variation in plant functional traits across 
+#   contrasting habitats in a seasonally dry tropical forest in the 
+#   Northern Western Ghats. BS-MS dissertation, Department of Biology, 
+#   Indian Institute of Science Education and Research (IISER) Pune, India. 
+#   http://dr.iiserpune.ac.in:8080/xmlui/handle/123456789/594
+#
+# The tables are appendices 3 and 4 of that thesis and are reproduced here
+# by citation only; they are the copyright of the author and are not
+# redistributed with this code or with the associated data archive.
+#
+# To run this script, obtain the thesis, extract the two appendix tables,
+# and save them as:
+#
+#   data/jezeera_2016_thesis_data/appendix3_relative_density.csv
+#   data/jezeera_2016_thesis_data/appendix4_relative_dominance.csv
+#
+# Expected columns: species name, plant type, density, cover.
+# ---------------------------------------------------------------------------
+
 #note: needed to remove the non-breaking spaces 
 # cd PATH_TO_PROJECT_ROOT
 # sed 's/\xa0/ /g' Y_PFATE.csv > Y_PFATE_repl.csv
+
 community_properties_full <- read.csv("data/spinup/spinup_PF/Y_mean_PFATE.csv")
 species_properties_full <- read.csv("data/spinup/spinup_PF/Y_PFATE_repl.csv") 
 fluxes_full <- read.csv("data/spinup/spinup_PF/D_PFATE.csv") 
-thesis_species0 <- read.csv("data/spinup/spinup_PF/species_thesis.csv")
+
+
+
+density_cover_sub <- read.csv("data/spinup/spinup_PF/species_thesis.csv")
+
+folder_out <- "out/step2_plantfate_figures/"
+
+if(dir.exists(folder_out) == FALSE){
+  dir.create(folder_out)
+}
 
 #### subsetting for the first 500 years ####
 
@@ -69,11 +104,8 @@ species_properties_plot <- ggarrange(sp_dens, sp_ph, sp_ca, sp_ba, sp_tb, sp_see
           common.legend = TRUE)
 species_properties_plot
 # # legend = "none"
-# ggsave("data/spinup/spinup_PF/plots/species_properties_plot.png",species_properties_plot,
-#        width = 9.23, height = 8.06)
-
-# ggsave("data/spinup/spinup_PF/plots/species_properties_plot_5000.png",species_properties_plot,
-#        width = 9.23, height = 8.06)
+ggsave(paste(folder_out, "species_properties_plot.png", sep = ""), plot = species_properties_plot,
+       width = 9.23, height = 8.06)
 
 ##### community properties #####
 
@@ -126,8 +158,8 @@ community_properties_plot <- ggarrange(com_dens, com_cl, com_cw, com_ccr, com_fc
                                        com_tb, com_lai,
                                      ncol = 3, nrow = 3)
 # 
-# ggsave("data/spinup/spinup_PF/plots/community_properties_plot.png",community_properties_plot,
-#        width = 7.26, height = 5.62)
+ggsave(paste(folder_out, "community_properties_plot.png", sep = ""), plot = community_properties_plot,
+       width = 7.26, height = 5.62)
 
 
 ##### fluxes #####
@@ -170,29 +202,57 @@ swpa <- ggplot(fluxes)+
 fluxes_plot <- ggarrange(gpp, npp, mort, trans, vcmax, swpa,
                                        ncol = 2, nrow = 3)
 
-# ggsave("data/spinup/spinup_PF/plots/fluxes_plot.png",fluxes_plot,
-# width = 9.83, height = 7.51)
+ggsave(paste(folder_out, "fluxes_plot.png", sep = ""),fluxes_plot, width = 9.83, height = 7.51)
 
 
 
 ##### compare species density with radar chart #####
 
+density_path <- "data/asmi_2016_thesis_data/appendix3_relative_density.csv"
+cover_path   <- "data/asmi_2016_thesis_data/appendix4_relative_dominance.csv"
 
-thesis_species0$SPECIES <- str_trim(thesis_species0$SPECIES)
+if (!file.exists(density_path) || !file.exists(cover_path)) {
+  stop(
+    "Species density/cover tables not found.\n",
+    "These are appendices 3 and 4 of Asmi (2016) and are not\n",
+    "redistributed with this repository. See the header of this script\n",
+    "for how to obtain them and where to place them."
+  )
+}
 
-thesis_species <- thesis_species0 %>% 
-  filter(X == c(1:10)) %>% 
-  select(SPECIES, DENSITY) %>% 
-  arrange (-DENSITY) %>%
-  rename(Species = SPECIES,
-         Density = DENSITY)%>% 
-  # mutate(Density = Density_real/10) %>% 
-  mutate(Species = fct_recode(Species, 
-                              "Memecylon umbellatum" = "Memycelon umbellatum",
-                              "Aglaia lawii" = "Amoora lawii")) %>% 
+density <- read.csv(density_path)
+cover   <- read.csv(cover_path)
+# For some reason this does not actually sum up to one so fixing
+density$Closed <- density$Closed /sum(density$Closed, na.rm = TRUE) 
+density$Open <- density$Open /sum(density$Open, na.rm = TRUE)
+density$Edge <- density$Edge /sum(density$Edge, na.rm = TRUE)
+
+cover$Closed <- cover$Closed /sum(cover$Closed, na.rm = TRUE)
+cover$Open <- cover$Open /sum(cover$Open, na.rm = TRUE)
+cover$Edge <- cover$Edge /sum(cover$Edge, na.rm = TRUE)
+
+density_sub <- density %>%
+  select(Species, Closed) %>%
+  filter(Closed >= 0.009 & !stringr::str_starts(Species, "Unknown")) %>%
+  arrange(desc(Closed))
+
+
+cover_sub <- cover %>%
+  select(Species, Closed) %>%
+  filter(Closed >= 0.009 & !stringr::str_starts(Species, "Unknown")) %>%
+  arrange(desc(Closed))
+
+density_cover_sub <- dplyr::full_join(density_sub, cover_sub, by = "Species", suffix = c(".density", ".cover"), )
+density_cover_sub$Species[density_cover_sub$Species == "Memecylon umbellatum"] = "Memycelon umbellatum"
+density_cover_sub$Species[density_cover_sub$Species == "Aglaia lawii"] = "Amoora lawii"
+density_cover_sub$Species <- factor(density_cover_sub$Species, levels=unique(density_cover_sub$Species))
+density_cover_sub$Species <- str_trim(density_cover_sub$Species)
+
+thesis_species <- density_cover_sub %>% 
+  select(Species, Closed.density) %>% 
+  arrange (-Closed.density) %>%
+  rename(Density = Closed.density) %>% 
   mutate(Data = "Thesis") 
-  # select(-Density_real)
-
 
 pf_species_100 <- species_properties %>% 
   filter(YEAR == -2920) %>% 
@@ -241,7 +301,7 @@ compare_density_long_log0 <- compare_density_long0 %>%
 compare_density_long_log <- rbind(rep(-1,10), rep(-11,10) , compare_density_long_log0)
 
 # final plot
-png(filename="data/spinup/spinup_PF/plots/spiderplot_log_densities.png", width = 945, height = 501)
+png(filename=paste(folder_out, "spiderplot_log_densities.png", sep = ""), width = 945, height = 501)
 radarchart(compare_density_long_log)
 legend(1.5,1, legend=c("Original thesis values", "PF 100 year run", "PF 500 year run"), title="log(Density)", pch=1, 
        bty="n" ,lwd=3, y.intersp=1, horiz=FALSE, col=c("black","pink", "green"))
