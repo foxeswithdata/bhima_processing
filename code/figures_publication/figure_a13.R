@@ -12,12 +12,12 @@ library(scico)
 palette_colours = scico(7, palette = "hawaii")
 
 
-forest_cells <- read.csv("data/plantFATE_rerun_data/simulation_list.csv") %>%
+forest_cells <- read.csv("data/plantfate_reruns/simulation_list.csv") %>%
   filter(new_forest == FALSE & biodiversity == "hb")
 
 
 community_data_out_all <- lapply(1:nrow(forest_cells), function(i){
-  results_directory = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_",
+  results_directory = paste("data/plantfate_reruns/individual_cell_simulations/GEB_step4_",
                             forest_cells$biodiversity[i],
                             "_af_10/cell_", 
                             forest_cells$cell[i],

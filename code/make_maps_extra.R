@@ -178,8 +178,6 @@ afforestation_plots <- ggarrange(plot_02, plot_04, plot_06, plot_08, plot_1,
                                  ncol = 2, nrow = 3)
 
 afforestation_plots
-# ggsave(plot = afforestation_plots, filename = "../out/plots/afforestation_maps.png", 
-#        height = 8.06, width = 9.73)
 
 filename_figure = paste("map_potential_afforestation", sep = "_")
 filename_figure = paste(filename_figure, "png", sep = ".")

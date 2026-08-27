@@ -25,12 +25,12 @@ species <- c("All Species", "Dimorphocalyx lawianus", "Memecylon umbellatum", "M
 palette_colours <- setNames(palette_colours, species)
 
 
-forest_cells <- read.csv("data/plantFATE_rerun_data/simulation_list.csv") %>%
+forest_cells <- read.csv("data/plantfate_reruns/simulation_list.csv") %>%
   filter(biodiversity == "hb" & new_forest == TRUE)
 
 
 species_data_out_all <- lapply(1:nrow(forest_cells), function(i){
-  results_directory = paste("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_hb_af_10/cell_", 
+  results_directory = paste("data/plantfate_reruns/individual_cell_simulations/GEB_step4_hb_af_10/cell_", 
                             forest_cells$cell[i],
                             "_hb/", 
                             sep = "")

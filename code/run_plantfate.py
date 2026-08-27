@@ -68,11 +68,11 @@ for index_s, row_s in simulation_list.iterrows():
     env_input = pd.read_csv(env_input_fn)
     #
     # ### Find correct parameter file
-    param_file_div = "data/plantFATE_rerun_data/settings"
+    param_file_div = "data/plantfate_reruns/settings"
     if biodiv == "lb":
-        param_file_div = "data/plantFATE_rerun_data/settings/low_biodiversity"
+        param_file_div = "data/plantfate_reruns/settings/low_biodiversity"
     else:
-        param_file_div = "data/plantFATE_rerun_data/settings/high_biodiversity"
+        param_file_div = "data/plantfate_reruns/settings/high_biodiversity"
 
     param_file = param_file_div
     if new_cell:

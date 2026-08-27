@@ -7,7 +7,7 @@ import geopandas as gpd
 ### STEP 4 data
 
 # --- region of interest, used to clip every zarr dataset to the study area ---
-ghod_region = gpd.read_file("../data/maps/region.gpkg")
+ghod_region = gpd.read_file("data/maps/region.gpkg")
 out_folder = "out/ssp3/spatial_preprocessing/"
 
 data_folder = "data/ssp3_out/"
@@ -48,7 +48,7 @@ outputs_all_df = pd.DataFrame(data = {'file_name': all_outputs,
 # --- soil layer depth, used to convert soil_moisture from a water-height (m)
 # into a relative moisture fraction. Averaged over time since depth is assumed
 # constant across the simulation period. ---
-soil_data_filename = "data/" + "soil_layer_forest_height_m_m.zarr"
+soil_data_filename = "data/" + "soil_layer_forest_height_m.zarr"
 da_zarr_soil = xr.open_zarr(soil_data_filename, consolidated=False)
 da_zarr_soil.rio.write_crs(ghod_region.crs, inplace=True)
 da_zarr_soil = da_zarr_soil.rio.clip(
@@ -118,7 +118,7 @@ for index_o, row_o in outputs_df.iterrows():
             # the "na" (no-afforestation) baseline simulation doesn't have its own
             # area file, so fall back to the af_00 forest area as a stand-in
             if row['afforestation'] == 'na':
-                filename_area = "../data/GEB_step4_test_new_forest_area_af_00_lb/hydrology.soil/forest_area_m2.zarr"
+                filename_area = "data/GEB_step4_test_new_forest_area_af_00_lb/hydrology.soil/forest_area_m2.zarr"
 
 
             da_zarr_area = xr.open_zarr(filename_area, consolidated=False)
