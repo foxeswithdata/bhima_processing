@@ -18,7 +18,7 @@ def process_time_units(plantFATE_model):
     time_unit = time_unit[2].split("-")
     return datetime(int(time_unit[0]), int(time_unit[1]), int(time_unit[2]))
 
-simulation_list_out = "data/plantFATE_rerun_data/simulation_list.csv"
+simulation_list_out = "data/plantfate_reruns/simulation_list.csv"
 simulation_list = []
 num_sims_per_setting = 10
 
@@ -27,8 +27,8 @@ if os.path.exists(simulation_list_out):
 else:
     biodiversity = ["lb", "hb"]
     new_forest = [True, False]
-    afforestation_new_fn = "data/afforestation_new_10_cells.csv"
-    afforestation_fn = "data/afforestation_10_cells.csv"
+    afforestation_new_fn = "data/plantfate_reruns/cell_lists/afforestation_new_10_cells.csv"
+    afforestation_fn = "data/plantfate_reruns/cell_lists/afforestation_10_cells.csv"
     afforestation_new = pd.read_csv(afforestation_new_fn)
     afforestation = pd.read_csv(afforestation_fn)
 
@@ -64,7 +64,7 @@ for index_s, row_s in simulation_list.iterrows():
 
     ### Find correct environment file
     # once hb 10 is processed for new cells need to make this variable for those
-    env_input_fn = "data/" + "plantFATE_rerun_data/" "GEB_step4_" + biodiv + "_af_10/" + "env_data_cell_" + str(cell_id) + ".csv"
+    env_input_fn = "data/" + "plantfate_reruns/" "GEB_step4_" + biodiv + "_af_10/" + "env_data_cell_" + str(cell_id) + ".csv"
     env_input = pd.read_csv(env_input_fn)
     #
     # ### Find correct parameter file
@@ -101,7 +101,7 @@ for index_s, row_s in simulation_list.iterrows():
 
     # ### Set up output information
 
-    out_dir = Path("out/PlantFATE_reruns_out/individual_cell_simulations/GEB_step4_" + biodiv + "_af_10")
+    out_dir = Path("out/plantfate_reruns/individual_cell_simulations/GEB_step4_" + biodiv + "_af_10")
     out_dir.mkdir(parents=True, exist_ok=True)
     expt_name = f"cell_{cell_id}_{biodiv}"  # expt name - results will be stored in outDir/exptName
 
@@ -115,7 +115,7 @@ for index_s, row_s in simulation_list.iterrows():
         plantFATE_model.config.continuePrevious = False
     else:
         plantFATE_model.config.continuePrevious = True
-        directory = Path(str("data/plantFATE_rerun_data/GEB_step3_plantfate_" + biodiv + "_spinup/plantFATE/") + f"cell_{cell_id}" )
+        directory = Path(str("data/plantfate_reruns/spinup_state/GEB_step3_plantfate_" + biodiv + "_spinup/plantFATE/") + f"cell_{cell_id}" )
         plantFATE_model.config.continueFrom_stateFile = str(Path(directory / "pf_saved_state.txt"))
         plantFATE_model.config.continueFrom_configFile = str(Path(directory /"pf_saved_config.ini"))
 
