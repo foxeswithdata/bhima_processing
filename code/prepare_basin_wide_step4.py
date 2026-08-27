@@ -18,7 +18,7 @@ outputs_pf = [ "groundwater_recharge_plantfate_m.zarr", "soil_moisture_plantfate
 all_outputs = outputs + outputs_pf
 
 
-soil_data_filename = "data/" + "soil_layer_forest_height_m_m.zarr"
+soil_data_filename = "data/" + "soil_layer_forest_height_m.zarr"
 da_zarr_soil = xr.open_zarr(soil_data_filename, consolidated=False)
 da_zarr_soil.rio.write_crs(ghod_region.crs, inplace=True)
 da_zarr_soil = da_zarr_soil.rio.clip(

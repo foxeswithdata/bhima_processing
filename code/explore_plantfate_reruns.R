@@ -3,7 +3,7 @@ rm(list = ls())
 library(tidyverse)
 library(ggpubr)
 Sys.setlocale("LC_ALL", "en_US.UTF-8")
-forest_cells <- read.csv("data/plantFATE_rerun_data/simulation_list.csv")
+forest_cells <- read.csv("data/plantfate_reruns/simulation_list.csv")
 forest_cells <- unique(forest_cells[forest_cells["biodiversity"] == "lb", c("cell", "biodiversity")])
 
 for (i in 1:nrow(forest_cells)){
@@ -50,10 +50,10 @@ for (i in 1:nrow(forest_cells)){
     return(spn)
   })
   
-  environment_data_hb <- read.csv(paste("data/plantFATE_rerun_data/GEB_step4_hb_af_10/env_data_cell_", forest_cells$cell[i], ".csv", sep = ""))
+  environment_data_hb <- read.csv(paste("data/plantfate_reruns/environmental_data/GEB_step4_hb_af_10/env_data_cell_", forest_cells$cell[i], ".csv", sep = ""))
   environment_data_hb$Date <- as.Date(environment_data_hb$Date)
   environment_data_hb$biodiversity = "High"
-  environment_data_lb <- read.csv(paste("data/plantFATE_rerun_data/GEB_step4_lb_af_10/env_data_cell_", forest_cells$cell[i], ".csv", sep = ""))
+  environment_data_lb <- read.csv(paste("data/plantfate_reruns/environmental_data/GEB_step4_lb_af_10/env_data_cell_", forest_cells$cell[i], ".csv", sep = ""))
   environment_data_lb$Date <- as.Date(environment_data_lb$Date)
   environment_data_lb$biodiversity = "Low"
   environment_data <- rbind(environment_data_hb, environment_data_lb)

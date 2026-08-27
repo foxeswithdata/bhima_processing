@@ -31,7 +31,7 @@ ghod_region_filename = "data/maps/region.gpkg"
 ghod_region = gpd.read_file(ghod_region_filename)
 
 ## Prepare soil data for normalization
-soil_data_filename = "data/soil_layer_forest_height_m_m.zarr"
+soil_data_filename = "data/soil_layer_forest_height_m.zarr"
 da_zarr_soil = xr.open_zarr(soil_data_filename, consolidated=False)
 da_zarr_soil.rio.write_crs(ghod_region.crs, inplace=True)
 da_zarr_soil = da_zarr_soil.rio.clip(ghod_region.geometry, ghod_region.crs, drop=True)

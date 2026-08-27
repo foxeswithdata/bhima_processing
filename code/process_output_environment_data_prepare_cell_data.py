@@ -8,9 +8,9 @@ import itertools
 afforestation = "00"
 biodiversity = "hb"
 
-df_cells = pd.read_csv(str("data/afforestation_" + afforestation + "_cells.csv"))
+df_cells = pd.read_csv(str("data/plantfate_reruns/cell_lists/afforestation_" + afforestation + "_cells.csv"))
 print(df_cells.head())
-df_simulation_list = pd.read_csv("data/plantFATE_rerun_data/simulation_list.csv")
+df_simulation_list = pd.read_csv("data/plantfate_reruns/simulation_list.csv")
 df_cells = df_cells[df_cells['cell'].isin(df_simulation_list['cell'])]
 print(df_cells.head())
 
@@ -70,7 +70,7 @@ for cell_id in df_cells.index:
                                    "SWP" : list(da_swp_aggregated)})
     #
     # print(out_put.head())
-    folder_out = str("data/plantFATE_rerun_data/" + "GEB_step4_" + biodiversity + "_af_" + afforestation + "/")
+    folder_out = str("data/plantfate_reruns/environmental_data/" + "GEB_step4_" + biodiversity + "_af_" + afforestation + "/")
 
     if not os.path.exists(folder_out):
         os.makedirs(folder_out)

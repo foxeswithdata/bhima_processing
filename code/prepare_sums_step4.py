@@ -34,7 +34,7 @@ outputs_all_df = pd.DataFrame(data = {'file_name': all_outputs,
                                               'groundwater_recharge_plantfate_m', 'soil_moisture_plantfate_m', 'transpiration_plantfate_m',  'biomass_forest_plantFATE', 'NPP_forest_plantFATE']})
 
 
-soil_data_filename = "data/" + "soil_layer_forest_height_m_m.zarr"
+soil_data_filename = "data/" + "soil_layer_forest_height_m.zarr"
 da_zarr_soil = xr.open_zarr(soil_data_filename, consolidated=False)
 da_zarr_soil.rio.write_crs(ghod_region.crs, inplace=True)
 da_zarr_soil = da_zarr_soil.rio.clip(
