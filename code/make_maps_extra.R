@@ -199,11 +199,11 @@ ggsave(filename_figure, plot = afforestation_plots, device = NULL, path = NULL,
 ### Map evaluated plantFATE sites
 
 
-forest_cells <- read.csv("test_plantFATE_out/data/simulation_list.csv")
+forest_cells <- read.csv("data/plantfate_reruns/simulation_list.csv")
 forest_cells <- unique(select(forest_cells, c("new_forest", "cell")))
 
-cell_locations_new <- read.csv("data/afforestation_new_10_cells.csv")
-cell_locations_existing <- read.csv("data/afforestation_10_cells.csv")
+cell_locations_new <- read.csv("data/plantfate_reruns/cell_lists/afforestation_new_10_cells.csv")
+cell_locations_existing <- read.csv("data/plantfate_reruns/cell_lists/afforestation_10_cells.csv")
 
 cell_locations <- rbind(cell_locations_new, cell_locations_existing)
 

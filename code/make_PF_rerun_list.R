@@ -1,14 +1,14 @@
 set.seed(0110)
 
 
-simulation_list_out = "test_plantFATE_out/data/simulation_list.csv"
+simulation_list_out = "data/plantfate_reruns/simulation_list.csv"
 num_sims_per_setting = 10
 
 
 biodiversity = c("lb", "hb")
 new_forest = c(TRUE, FALSE)
-afforestation_new_fn = "data/afforestation_new_10_cells.csv"
-afforestation_fn = "data/afforestation_10_cells.csv"
+afforestation_new_fn = "data/plantfate_reruns/cell_lists/afforestation_new_10_cells.csv"
+afforestation_fn = "data/plantfate_reruns/cell_lists/afforestation_10_cells.csv"
 afforestation_new = read_csv(afforestation_new_fn)
 afforestation = read_csv(afforestation_fn)
 

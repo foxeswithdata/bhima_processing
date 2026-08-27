@@ -7,7 +7,6 @@ import random
 
 from pypfate import Patch as patch
 
-os.chdir("..")
 
 def process_time_units(plantFATE_model):
     time_unit = plantFATE_model.config.time_unit
