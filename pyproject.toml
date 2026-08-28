@@ -1,9 +1,28 @@
 [project]
 name = "bhima-processing"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "Analysis and figure code for coupled GEB-PlantFATE afforestation scenarios in the Ghod subbasin, Maharashtra, India"
 readme = "README.md"
 requires-python = ">=3.13"
+license = "GPL-3.0-or-later"
+authors = [
+    { name = "Elisa Z. Stefaniak" },
+    { name = "Jaideep Joshi" },
+    { name = "Silvia Artuso" },
+    { name = "Tania L. Maxwell" },
+    { name = "Mikhail Smilovic" },
+    { name = "Florian Hofhansl" },
+    { name = "Jens A. de Bruijn" },
+]
+keywords = [
+    "GEB",
+    "PlantFATE",
+    "afforestation",
+    "socio-hydrology",
+    "forest-restoration",
+    "biodiversity",
+    "vegetation-demography",
+]
 dependencies = [
     "cartopy>=0.25.0",
     "cmcrameri>=1.9",
@@ -15,3 +34,7 @@ dependencies = [
     "xarray>=2025.10.1",
     "zarr>=3.1.3",
 ]
+ 
+[project.urls]
+Repository = "https://github.com/foxeswithdata/bhima_processing"
+Data = "https://doi.org/10.5281/zenodo.18457345"
