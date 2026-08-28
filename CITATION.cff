@@ -1,0 +1,73 @@
+cff-version: 1.2.0
+title: "bhima_processing: analysis code for GEB-PlantFATE v1.0 afforestation scenarios"
+message: "If you use this software, please cite both the software and the associated paper."
+type: software
+authors:
+  - given-names: "Elisa Z."
+    family-names: Stefaniak
+    orcid: "https://orcid.org/0000-0003-2998-5619"
+    affiliation: "International Institute for Applied Systems Analysis (IIASA), Laxenburg, Austria"
+  - given-names: Jaideep
+    family-names: Joshi
+    orcid: "https://orcid.org/0000-0003-1315-6234"
+    affiliation: "Centre for Climate Studies, Indian Institute of Technology Bombay, Mumbai, India"
+  - given-names: Silvia
+    family-names: Artuso
+    orcid: "https://orcid.org/0000-0001-5428-4860"
+    affiliation: "International Institute for Applied Systems Analysis (IIASA), Laxenburg, Austria"
+  - given-names: "Tania L."
+    family-names: Maxwell
+    orcid: "https://orcid.org/0000-0002-8413-9186"
+    affiliation: "Université Paris-Saclay, CNRS, AgroParisTech, Ecologie Systématique et Evolution, Gif-sur-Yvette, France"
+  - given-names: Mikhail
+    family-names: Smilovic
+    orcid: "https://orcid.org/0000-0001-9651-8821"
+    affiliation: "International Institute for Applied Systems Analysis (IIASA), Laxenburg, Austria"
+  - given-names: Florian
+    family-names: Hofhansl
+    orcid: "https://orcid.org/0000-0003-0073-0946"
+    affiliation: "International Institute for Applied Systems Analysis (IIASA), Laxenburg, Austria"
+  - given-names: "Jens A."
+    family-names: "de Bruijn"
+    orcid: "https://orcid.org/0000-0003-3961-6382"
+    affiliation: "International Institute for Applied Systems Analysis (IIASA), Laxenburg, Austria"
+repository-code: "https://github.com/foxeswithdata/bhima_processing"
+abstract: >-
+  Analysis and figure code for a coupled GEB-PlantFATE study of afforestation
+  in the Ghod subbasin, Maharashtra, India. Processes daily model output for
+  twelve afforestation and biodiversity scenarios into catchment-scale
+  aggregates, spatial diagnostics and publication figures. Model output is
+  archived separately at doi:10.5281/zenodo.18457345.
+keywords:
+  - GEB
+  - PlantFATE
+  - afforestation
+  - socio-hydrology
+  - forest restoration
+  - biodiversity
+  - evapotranspiration
+  - vegetation demography
+  - Western Ghats
+  - India
+license: GPL-3.0-or-later
+version: "1.0.0"
+date-released: "2026-08-27"
+references:
+  - type: data
+    title: "Model outputs: GEB-PlantFATE v1.0 afforestation scenarios, Ghod subbasin, India"
+    doi: "10.5281/zenodo.18457345"
+    authors:
+      - given-names: "Elisa Z."
+        family-names: Stefaniak
+        orcid: "https://orcid.org/0000-0003-2998-5619"
+  - type: software
+    title: "GEB: a large-scale agent-based socio-hydrological model"
+    version: "v0.4"
+    doi: "10.5281/zenodo.22094305"
+    authors:
+      - given-names: "Jens A."
+        family-names: "de Bruijn"
+        orcid: "https://orcid.org/0000-0003-3961-6382"
+      - given-names: "Elisa Z."
+        family-names: Stefaniak
+        orcid: "https://orcid.org/0000-0003-2998-5619"
